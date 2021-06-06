@@ -39,6 +39,10 @@ func TestMysqlLeader(t *testing.T) {
 			name:   "testElectedIsLeader",
 			testFn: testElectedIsLeader,
 		},
+		{
+			name:   "testElectionWinnerIsLeader",
+			testFn: testElectionWinnerIsLeader,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -77,5 +81,58 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 	isLeader, err := leader.IsLeader(ctx)
 	if assert.NoError(t, err) {
 		assert.True(t, isLeader)
+	}
+}
+
+func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
+	ctx := context.Background()
+	leaderName := uuid.New().String()
+
+	mock := clock.NewMock()
+	mock.Set(time.Now())
+
+	l1 := &mysqlLeader{
+		db:         db,
+		leaderName: leaderName,
+		nodeName:   uuid.New().String(),
+		clock:      mock,
+		age:        10 * time.Second,
+	}
+	l2 := &mysqlLeader{
+		db:         db,
+		leaderName: leaderName,
+		nodeName:   uuid.New().String(),
+		clock:      mock,
+		age:        10 * time.Second,
+	}
+
+	e1 := l1.election()
+	e2 := l2.election()
+
+	// l1 wins election
+	require.NoError(t, e1(ctx))
+	require.NoError(t, e2(ctx))
+
+	isLeader, err := l1.IsLeader(ctx)
+	if assert.NoError(t, err) {
+		assert.True(t, isLeader, "l1 should be leader")
+	}
+	isLeader, err = l2.IsLeader(ctx)
+	if assert.NoError(t, err) {
+		assert.False(t, isLeader, "l2 should not be leader")
+	}
+
+	// l2 wins next election
+	mock.Add(11 * time.Second)
+	require.NoError(t, e2(ctx))
+	require.NoError(t, e1(ctx))
+
+	isLeader, err = l1.IsLeader(ctx)
+	if assert.NoError(t, err) {
+		assert.False(t, isLeader, "l1 should not be leader")
+	}
+	isLeader, err = l2.IsLeader(ctx)
+	if assert.NoError(t, err) {
+		assert.True(t, isLeader, "l2 should be leader")
 	}
 }
