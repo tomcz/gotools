@@ -14,8 +14,15 @@ lint:
 test:
 	go test -cover ./...
 
-.PHONY: docker-test-run
-docker-test-run:
+COMPOSE_CMD := docker-compose -p gotools -f scripts/docker-compose.yml
+
+.PHONY: docker
+docker:
+	@${COMPOSE_CMD} up -d
+	@bash -c "trap '${COMPOSE_CMD} down' EXIT; $(MAKE) docker-run"
+
+.PHONY: docker-run
+docker-run:
 	@docker run --rm                    \
 		-e WAIT_DB_HOST="database"      \
 		-e WAIT_DB_USER="root"          \
@@ -24,7 +31,7 @@ docker-test-run:
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
 		-t mysql:5.7                    \
-		./wait-for-mysql.sh
+		./scripts/wait-for-mysql.sh
 	@docker run --rm                    \
 		-e DB_HOST="database"           \
 		-e DB_DATABASE="gotools_test"   \
@@ -35,8 +42,3 @@ docker-test-run:
 		-w /code                        \
 		-t golang:1.16                  \
 		make lint test
-
-.PHONY: docker-test
-docker-test:
-	@docker-compose up -d
-	@bash -c "trap 'docker-compose down' EXIT; $(MAKE) docker-test-run"
