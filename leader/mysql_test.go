@@ -3,9 +3,12 @@ package leader
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/benbjohnson/clock"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -33,6 +36,10 @@ func TestMysqlLeader(t *testing.T) {
 			name:   "testUnelectedIsNotLeader",
 			testFn: testUnelectedIsNotLeader,
 		},
+		{
+			name:   "testElectedIsLeader",
+			testFn: testElectedIsLeader,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -48,5 +55,26 @@ func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 	isLeader, err := leader.IsLeader(ctx)
 	if assert.NoError(t, err) {
 		assert.False(t, isLeader)
+	}
+}
+
+func testElectedIsLeader(t *testing.T, db *sql.DB) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	mock := clock.NewMock()
+	leaderName := uuid.New().String()
+	leader := NewMysqlLeader(db, leaderName, WithClock(mock), WithTick(time.Second))
+
+	go func() {
+		if err := leader.StartElections(ctx); errors.Is(err, context.Canceled) {
+			t.Log("unexpected election error:", err)
+		}
+	}()
+	mock.Add(time.Second)
+
+	isLeader, err := leader.IsLeader(ctx)
+	if assert.NoError(t, err) {
+		assert.True(t, isLeader)
 	}
 }
