@@ -10,20 +10,27 @@ import (
 	"github.com/google/uuid"
 )
 
+// MysqlOpt allows configuration of leader defaults.
 type MysqlOpt func(leader *mysqlLeader)
 
+// WithNodeName allows the node name to be specified.
+// The default value is a random UUID.
 func WithNodeName(name string) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.nodeName = name
 	}
 }
 
+// WithTick allows the default election frequency to
+// be specified. The default is 15 seconds.
 func WithTick(tick time.Duration) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.tick = tick
 	}
 }
 
+// WithAge allows the default lifespan of an election
+// to be specified. The default is 60 seconds.
 func WithAge(age time.Duration) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.age = age
@@ -39,6 +46,11 @@ type mysqlLeader struct {
 	age        time.Duration
 }
 
+// NewMysqlLeader provides an implementation of the Leader interface using
+// MySQL as the point of coordination between nodes. It is not a perfect
+// leadership election implementation but should be good enough providing
+// that tasks that require leadership election do not run for longer than
+// either the tick or age intervals.
 func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 	leader := &mysqlLeader{
 		db:         db,
@@ -107,6 +119,9 @@ func (m *mysqlLeader) election() func(context.Context) error {
 	}
 }
 
+// CreateMysqlLeaderSQL is the create statement used by CreateMysqlLeaderTable.
+// It's published so that it can be used in database migrations without needing
+// to call the CreateMysqlLeaderTable function.
 const CreateMysqlLeaderSQL = `
 CREATE TABLE IF NOT EXISTS leader_election (
   id          int unsigned NOT NULL AUTO_INCREMENT,
@@ -118,6 +133,9 @@ CREATE TABLE IF NOT EXISTS leader_election (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 `
 
+// CreateMysqlLeaderTable sets up the leadership election table and its constraints.
+// It is not part of the MysqlLeader object since in practice it's a bad idea to run
+// services with permissions to create or modify database schemas.
 func CreateMysqlLeaderTable(db *sql.DB) error {
 	_, err := db.Exec(CreateMysqlLeaderSQL)
 	return err
