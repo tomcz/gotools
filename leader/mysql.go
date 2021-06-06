@@ -88,7 +88,7 @@ node_name = IF(last_update < DATE_SUB(VALUES(last_update), INTERVAL %d SECOND), 
 last_update = IF(node_name = VALUES(node_name), VALUES(last_update), last_update)
 `
 
-func (m *mysqlLeader) Election(ctx context.Context) error {
+func (m *mysqlLeader) StartElections(ctx context.Context) error {
 	stmt := fmt.Sprintf(electionSQL, int64(m.age.Seconds()))
 	ticker := m.clock.Ticker(m.tick)
 	defer ticker.Stop()
@@ -105,7 +105,7 @@ func (m *mysqlLeader) Election(ctx context.Context) error {
 	}
 }
 
-const CreateLeaderSQL = `
+const CreateMysqlLeaderSQL = `
 CREATE TABLE IF NOT EXISTS leader_election (
   id          int unsigned NOT NULL AUTO_INCREMENT,
   leader_name varchar(255) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS leader_election (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 `
 
-func SetupMysqlLeaderTable(db *sql.DB) error {
-	_, err := db.Exec(CreateLeaderSQL)
+func CreateMysqlLeaderTable(db *sql.DB) error {
+	_, err := db.Exec(CreateMysqlLeaderSQL)
 	return err
 }

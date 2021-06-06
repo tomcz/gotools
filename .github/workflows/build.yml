@@ -1,0 +1,31 @@
+name: "go-build"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    env:
+      DB_HOST: localhost
+      DB_DATABASE: gotools_test
+      DB_USER: root
+      DB_PASSWORD: 'root'
+    steps:
+      - name: "Setup MySQL"
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -e 'CREATE DATABASE gotools_test;' -uroot -proot
+          mysql -e 'SHOW DATABASES;' -uroot -proot
+      - uses: actions/checkout@v2
+      - name: "Set up Go"
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - name: Build
+        run: make build

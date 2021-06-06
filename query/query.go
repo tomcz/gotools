@@ -11,7 +11,7 @@ type EachRowFn func(row ScanFn) error
 
 type PartialQuery func(row EachRowFn) error
 
-func Query(db *sql.DB, query string, args ...interface{}) PartialQuery {
+func QueryRows(db *sql.DB, query string, args ...interface{}) PartialQuery {
 	return func(row EachRowFn) error {
 		rows, err := db.Query(query, args...)
 		if err != nil {
@@ -27,7 +27,7 @@ func Query(db *sql.DB, query string, args ...interface{}) PartialQuery {
 	}
 }
 
-func QueryContext(ctx context.Context, db *sql.DB, query string, args ...interface{}) PartialQuery {
+func QueryRowsContext(ctx context.Context, db *sql.DB, query string, args ...interface{}) PartialQuery {
 	return func(row EachRowFn) error {
 		rows, err := db.QueryContext(ctx, query, args...)
 		if err != nil {
