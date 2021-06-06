@@ -6,7 +6,7 @@ build: lint test
 .PHONY: lint
 lint:
  ifeq (, $(shell which staticcheck))
-	go install honnef.co/go/tools/cmd/staticcheck@latest
+	go install honnef.co/go/tools/cmd/staticcheck@2021.1
  endif
 	staticcheck ./...
 
