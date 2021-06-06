@@ -1,0 +1,14 @@
+version: "2"
+
+services:
+  database:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: gotools_test
+      MYSQL_ROOT_PASSWORD: sekret
+    networks:
+      - local
+
+networks:
+  local:
+    driver: bridge

@@ -16,6 +16,7 @@ import (
 
 func TestMysqlLeader(t *testing.T) {
 	cfg := mysql.NewConfig()
+	cfg.Net = "tcp"
 	cfg.Addr = os.Getenv("DB_HOST")
 	cfg.DBName = os.Getenv("DB_DATABASE")
 	cfg.User = os.Getenv("DB_USER")
