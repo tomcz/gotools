@@ -12,7 +12,11 @@ lint:
 
 .PHONY: test
 test:
+ifdef DB_HOST
+	go test -cover -tags=integration ./...
+else
 	go test -cover ./...
+endif
 
 COMPOSE_CMD := docker-compose -p gotools -f scripts/docker-compose.yml
 
@@ -41,4 +45,4 @@ docker-run:
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
 		-t golang:1.16                  \
-		make lint test
+		make build
