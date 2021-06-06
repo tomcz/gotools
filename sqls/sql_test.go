@@ -111,11 +111,11 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 	if assert.NoError(t, err) {
 		results := make(map[string]string)
 		err = QueryRows(db, selectLeadersSQL)(func(row ScanFunc) error {
-			var lead, node string
-			if err := row(&lead, &node); err != nil {
+			var leader, node string
+			if err := row(&leader, &node); err != nil {
 				return nil
 			}
-			results[lead] = node
+			results[leader] = node
 			return nil
 		})
 		if assert.NoError(t, err) {
@@ -187,11 +187,11 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 	if assert.NoError(t, err) {
 		results := make(map[string]string)
 		err = QueryRowsContext(ctx, db, selectLeadersSQL)(func(row ScanFunc) error {
-			var lead, node string
-			if err := row(&lead, &node); err != nil {
+			var leader, node string
+			if err := row(&leader, &node); err != nil {
 				return nil
 			}
-			results[lead] = node
+			results[leader] = node
 			return nil
 		})
 		if assert.NoError(t, err) {
