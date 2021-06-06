@@ -8,7 +8,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// PopulateFromEnv populates the target using environment variables and mapstructure mappings.
+// PopulateFromEnv populates the target using environment variables and
+// mapstructure (https://github.com/mitchellh/mapstructure) mappings.
 // Please note that the target must be a pointer to a struct.
 func PopulateFromEnv(target interface{}) error {
 	r := reflect.TypeOf(target)
