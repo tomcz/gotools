@@ -18,12 +18,6 @@ func WithNodeName(name string) MysqlOpt {
 	}
 }
 
-func WithClock(ck clock.Clock) MysqlOpt {
-	return func(leader *mysqlLeader) {
-		leader.clock = ck
-	}
-}
-
 func WithTick(tick time.Duration) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.tick = tick
@@ -46,15 +40,16 @@ type mysqlLeader struct {
 }
 
 func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
-	leader := &mysqlLeader{db: db, leaderName: leaderName}
+	leader := &mysqlLeader{
+		db:         db,
+		leaderName: leaderName,
+		clock:      clock.New(),
+	}
 	for _, opt := range opts {
 		opt(leader)
 	}
 	if leader.nodeName == "" {
 		leader.nodeName = uuid.New().String()
-	}
-	if leader.clock == nil {
-		leader.clock = clock.New()
 	}
 	if leader.tick < time.Second {
 		leader.tick = 15 * time.Second
@@ -63,6 +58,22 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 		leader.age = 60 * time.Second
 	}
 	return leader
+}
+
+func (m *mysqlLeader) StartElections(ctx context.Context) error {
+	election := m.election()
+	ticker := m.clock.Ticker(m.tick)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			if err := election(ctx); err != nil {
+				return err
+			}
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 }
 
 const isLeaderSQL = `
@@ -88,20 +99,11 @@ node_name = IF(last_update < DATE_SUB(VALUES(last_update), INTERVAL %d SECOND), 
 last_update = IF(node_name = VALUES(node_name), VALUES(last_update), last_update)
 `
 
-func (m *mysqlLeader) StartElections(ctx context.Context) error {
+func (m *mysqlLeader) election() func(context.Context) error {
 	stmt := fmt.Sprintf(electionSQL, int64(m.age.Seconds()))
-	ticker := m.clock.Ticker(m.tick)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ticker.C:
-			_, err := m.db.ExecContext(ctx, stmt, m.leaderName, m.nodeName, m.clock.Now())
-			if err != nil {
-				return err
-			}
-		case <-ctx.Done():
-			return ctx.Err()
-		}
+	return func(ctx context.Context) error {
+		_, err := m.db.ExecContext(ctx, stmt, m.leaderName, m.nodeName, m.clock.Now())
+		return err
 	}
 }
 

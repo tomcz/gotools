@@ -3,7 +3,6 @@ package leader
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"os"
 	"testing"
 	"time"
@@ -59,19 +58,21 @@ func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 }
 
 func testElectedIsLeader(t *testing.T, db *sql.DB) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := context.Background()
 
 	mock := clock.NewMock()
-	leaderName := uuid.New().String()
-	leader := NewMysqlLeader(db, leaderName, WithClock(mock), WithTick(time.Second))
+	mock.Set(time.Now())
 
-	go func() {
-		if err := leader.StartElections(ctx); errors.Is(err, context.Canceled) {
-			t.Log("unexpected election error:", err)
-		}
-	}()
-	mock.Add(time.Second)
+	leader := &mysqlLeader{
+		db:         db,
+		leaderName: uuid.New().String(),
+		nodeName:   uuid.New().String(),
+		clock:      mock,
+		age:        10 * time.Second,
+	}
+
+	election := leader.election()
+	require.NoError(t, election(ctx))
 
 	isLeader, err := leader.IsLeader(ctx)
 	if assert.NoError(t, err) {
