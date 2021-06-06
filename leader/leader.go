@@ -2,7 +2,7 @@ package leader
 
 import "context"
 
-// Leader election, In distributed computing, is the process of designating
+// Leader election, in distributed computing, is the process of designating
 // a single process as the organizer of some task distributed among several
 // computers (nodes). Before the task has began, all network nodes are either
 // unaware which node will serve as the "leader" (or coordinator) of the task,
