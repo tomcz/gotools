@@ -15,9 +15,9 @@ endif
 
 .PHONY: lint
 lint:
- ifeq (, $(shell which staticcheck))
+ifeq (, $(shell which staticcheck))
 	go install honnef.co/go/tools/cmd/staticcheck@2021.1
- endif
+endif
 	staticcheck ./...
 
 .PHONY: test
