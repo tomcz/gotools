@@ -1,7 +1,17 @@
 BASE_DIR ?= $(shell git rev-parse --show-toplevel 2>/dev/null)
 
+.PHONY: precommit
+precommit: format build
+
 .PHONY: build
 build: lint test
+
+.PHONY: format
+format:
+ifeq (, $(shell which goimports))
+	go install golang.org/x/tools/cmd/goimports
+endif
+	goimports -w -local github.com/tomcz/gotools .
 
 .PHONY: lint
 lint:
