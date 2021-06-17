@@ -9,7 +9,7 @@ build: lint test
 .PHONY: format
 format:
 ifeq (, $(shell which goimports))
-	go install golang.org/x/tools/cmd/goimports
+	go get golang.org/x/tools/cmd/goimports
 endif
 	goimports -w -local github.com/tomcz/gotools .
 
