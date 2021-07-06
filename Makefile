@@ -6,6 +6,13 @@ precommit: format build
 .PHONY: build
 build: lint test
 
+.PHONY: generate
+generate:
+ifeq (, $(shell which genny))
+	go get github.com/cheekybits/genny
+endif
+	go generate ./...
+
 .PHONY: format
 format:
 ifeq (, $(shell which goimports))
