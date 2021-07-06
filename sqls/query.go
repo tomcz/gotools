@@ -25,7 +25,7 @@ func QueryRows(db *sql.DB, query string, args ...interface{}) PartialQuery {
 		}
 		defer rows.Close()
 		for rows.Next() {
-			if err := row(rows.Scan); err != nil {
+			if err = row(rows.Scan); err != nil {
 				return err
 			}
 		}
