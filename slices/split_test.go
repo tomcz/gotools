@@ -1,4 +1,4 @@
-package chunks
+package slices
 
 import (
 	"testing"

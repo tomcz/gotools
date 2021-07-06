@@ -1,8 +1,8 @@
-package chunks
+package slices
 
 import "github.com/cheekybits/genny/generic"
 
-//go:generate genny -in=$GOFILE -out=split.go gen "Something=string,int,int64,uint64"
+//go:generate genny -in=$GOFILE -out=split_gen.go gen "Something=string,int,int64,uint64"
 
 type Something generic.Type
 

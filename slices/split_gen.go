@@ -2,7 +2,7 @@
 // Any changes will be lost if this file is regenerated.
 // see https://github.com/cheekybits/genny
 
-package chunks
+package slices
 
 // SplitString splits a slice into parts of a given length, with a remainder if necessary.
 func SplitString(in []string, partLen int) [][]string {

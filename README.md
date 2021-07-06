@@ -98,12 +98,12 @@ func main() {
 }
 ```
 
-## chunks
+## slices
 
 Split slices into parts. My kingdom for generics in Go!
 
 ```go
-import "github.com/tomcz/gotools/chunks"
+import "github.com/tomcz/gotools/slices"
 
 in := []int{
     1, 2, 3,
@@ -117,7 +117,7 @@ expected := [][]int{
     {7, 8, 9},
     {10},
 }
-assert.Equal(t, expected, chunks.SplitInt(in, 3))
+assert.Equal(t, expected, slices.SplitInt(in, 3))
 ```
 
 ## sqls
