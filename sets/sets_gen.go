@@ -9,13 +9,13 @@ import (
 	"sort"
 )
 
-// StringSet adds set semantics to a map of values.
+// StringSet adds set semantics to a map of string to bool values.
 type StringSet map[string]bool
 
 var _ json.Marshaler = StringSet{}
 var _ json.Unmarshaler = &StringSet{}
 
-// NewStringSet creates a new set of String.
+// NewStringSet creates a new set of string values.
 func NewStringSet(values ...string) StringSet {
 	s := StringSet{}
 	s.AddAll(values)
@@ -135,6 +135,7 @@ func (s StringSet) Ordered() []string {
 	return ret
 }
 
+// MarshalJSON implements json.Marshaler.
 func (s StringSet) MarshalJSON() ([]byte, error) {
 	var values []string
 	if s != nil {
@@ -143,6 +144,7 @@ func (s StringSet) MarshalJSON() ([]byte, error) {
 	return json.Marshal(values)
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
 func (s *StringSet) UnmarshalJSON(in []byte) error {
 	var values []string
 	if err := json.Unmarshal(in, &values); err != nil {
@@ -153,13 +155,13 @@ func (s *StringSet) UnmarshalJSON(in []byte) error {
 	return nil
 }
 
-// IntSet adds set semantics to a map of values.
+// IntSet adds set semantics to a map of int to bool values.
 type IntSet map[int]bool
 
 var _ json.Marshaler = IntSet{}
 var _ json.Unmarshaler = &IntSet{}
 
-// NewIntSet creates a new set of Int.
+// NewIntSet creates a new set of int values.
 func NewIntSet(values ...int) IntSet {
 	s := IntSet{}
 	s.AddAll(values)
@@ -279,6 +281,7 @@ func (s IntSet) Ordered() []int {
 	return ret
 }
 
+// MarshalJSON implements json.Marshaler.
 func (s IntSet) MarshalJSON() ([]byte, error) {
 	var values []int
 	if s != nil {
@@ -287,6 +290,7 @@ func (s IntSet) MarshalJSON() ([]byte, error) {
 	return json.Marshal(values)
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
 func (s *IntSet) UnmarshalJSON(in []byte) error {
 	var values []int
 	if err := json.Unmarshal(in, &values); err != nil {
@@ -297,13 +301,13 @@ func (s *IntSet) UnmarshalJSON(in []byte) error {
 	return nil
 }
 
-// Int64Set adds set semantics to a map of values.
+// Int64Set adds set semantics to a map of int64 to bool values.
 type Int64Set map[int64]bool
 
 var _ json.Marshaler = Int64Set{}
 var _ json.Unmarshaler = &Int64Set{}
 
-// NewInt64Set creates a new set of Int64.
+// NewInt64Set creates a new set of int64 values.
 func NewInt64Set(values ...int64) Int64Set {
 	s := Int64Set{}
 	s.AddAll(values)
@@ -423,6 +427,7 @@ func (s Int64Set) Ordered() []int64 {
 	return ret
 }
 
+// MarshalJSON implements json.Marshaler.
 func (s Int64Set) MarshalJSON() ([]byte, error) {
 	var values []int64
 	if s != nil {
@@ -431,6 +436,7 @@ func (s Int64Set) MarshalJSON() ([]byte, error) {
 	return json.Marshal(values)
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
 func (s *Int64Set) UnmarshalJSON(in []byte) error {
 	var values []int64
 	if err := json.Unmarshal(in, &values); err != nil {
@@ -441,13 +447,13 @@ func (s *Int64Set) UnmarshalJSON(in []byte) error {
 	return nil
 }
 
-// Uint64Set adds set semantics to a map of values.
+// Uint64Set adds set semantics to a map of uint64 to bool values.
 type Uint64Set map[uint64]bool
 
 var _ json.Marshaler = Uint64Set{}
 var _ json.Unmarshaler = &Uint64Set{}
 
-// NewUint64Set creates a new set of Uint64.
+// NewUint64Set creates a new set of uint64 values.
 func NewUint64Set(values ...uint64) Uint64Set {
 	s := Uint64Set{}
 	s.AddAll(values)
@@ -567,6 +573,7 @@ func (s Uint64Set) Ordered() []uint64 {
 	return ret
 }
 
+// MarshalJSON implements json.Marshaler.
 func (s Uint64Set) MarshalJSON() ([]byte, error) {
 	var values []uint64
 	if s != nil {
@@ -575,6 +582,7 @@ func (s Uint64Set) MarshalJSON() ([]byte, error) {
 	return json.Marshal(values)
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
 func (s *Uint64Set) UnmarshalJSON(in []byte) error {
 	var values []uint64
 	if err := json.Unmarshal(in, &values); err != nil {

@@ -11,13 +11,13 @@ import (
 
 type Something generic.Number
 
-// SomethingSet adds set semantics to a map of values.
+// SomethingSet adds set semantics to a map of Something to bool values.
 type SomethingSet map[Something]bool
 
 var _ json.Marshaler = SomethingSet{}
 var _ json.Unmarshaler = &SomethingSet{}
 
-// NewSomethingSet creates a new set of Something.
+// NewSomethingSet creates a new set of Something values.
 func NewSomethingSet(values ...Something) SomethingSet {
 	s := SomethingSet{}
 	s.AddAll(values)
@@ -137,6 +137,7 @@ func (s SomethingSet) Ordered() []Something {
 	return ret
 }
 
+// MarshalJSON implements json.Marshaler.
 func (s SomethingSet) MarshalJSON() ([]byte, error) {
 	var values []Something
 	if s != nil {
@@ -145,6 +146,7 @@ func (s SomethingSet) MarshalJSON() ([]byte, error) {
 	return json.Marshal(values)
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
 func (s *SomethingSet) UnmarshalJSON(in []byte) error {
 	var values []Something
 	if err := json.Unmarshal(in, &values); err != nil {
