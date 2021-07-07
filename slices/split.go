@@ -2,17 +2,17 @@ package slices
 
 import "github.com/cheekybits/genny/generic"
 
-//go:generate genny -in=$GOFILE -out=split_gen.go gen "SliceType=string,int,int64,uint64"
+//go:generate genny -in=$GOFILE -out=split_gen.go gen "Slice=string,int,int64,uint64"
 
-type SliceType generic.Type
+type Slice generic.Type
 
-// SplitSliceType splits a slice into parts of a given length, with a remainder if necessary.
-func SplitSliceType(src []SliceType, partLen int) [][]SliceType {
+// SplitSlice splits a slice into parts of a given length, with a remainder if necessary.
+func SplitSlice(src []Slice, partLen int) [][]Slice {
 	srcLen := len(src)
 	if srcLen == 0 {
 		return nil
 	}
-	var dst [][]SliceType
+	var dst [][]Slice
 	for a := 0; a < srcLen; a += partLen {
 		z := a + partLen
 		if z > srcLen {
