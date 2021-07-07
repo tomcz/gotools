@@ -6,14 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConvertToInterface(t *testing.T) {
-	expected := []interface{}{1, 2, 3, 4}
-	actual := ConvertIntToInterface([]int{1, 2, 3, 4})
+func TestConvert(t *testing.T) {
+	expected := []DstType{1, 2, 3, 4}
+	actual := ConvertSrcTypeToDstType([]SrcType{1, 2, 3, 4})
 	assert.Equal(t, expected, actual)
 }
 
-func TestAppendToInterface(t *testing.T) {
-	expected := []interface{}{"foo", 2, 3, 4}
-	actual := AppendIntToInterface([]interface{}{"foo"}, 2, 3, 4)
+func TestAppend(t *testing.T) {
+	expected := []DstType{"foo", 2, 3, 4}
+	actual := AppendSrcTypeToDstType([]DstType{"foo"}, 2, 3, 4)
 	assert.Equal(t, expected, actual)
 }

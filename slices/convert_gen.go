@@ -5,69 +5,69 @@
 package slices
 
 // ConvertStringToInterface generics helper.
-func ConvertStringToInterface(in []string) []interface{} {
-	out := make([]interface{}, len(in))
-	for i, value := range in {
-		out[i] = value
+func ConvertStringToInterface(src []string) []interface{} {
+	dst := make([]interface{}, len(src))
+	for i, value := range src {
+		dst[i] = value
 	}
-	return out
+	return dst
 }
 
 // AppendStringToInterface generics helper.
-func AppendStringToInterface(out []interface{}, in ...string) []interface{} {
-	for _, value := range in {
-		out = append(out, value)
+func AppendStringToInterface(dst []interface{}, src ...string) []interface{} {
+	for _, value := range src {
+		dst = append(dst, value)
 	}
-	return out
+	return dst
 }
 
 // ConvertIntToInterface generics helper.
-func ConvertIntToInterface(in []int) []interface{} {
-	out := make([]interface{}, len(in))
-	for i, value := range in {
-		out[i] = value
+func ConvertIntToInterface(src []int) []interface{} {
+	dst := make([]interface{}, len(src))
+	for i, value := range src {
+		dst[i] = value
 	}
-	return out
+	return dst
 }
 
 // AppendIntToInterface generics helper.
-func AppendIntToInterface(out []interface{}, in ...int) []interface{} {
-	for _, value := range in {
-		out = append(out, value)
+func AppendIntToInterface(dst []interface{}, src ...int) []interface{} {
+	for _, value := range src {
+		dst = append(dst, value)
 	}
-	return out
+	return dst
 }
 
 // ConvertInt64ToInterface generics helper.
-func ConvertInt64ToInterface(in []int64) []interface{} {
-	out := make([]interface{}, len(in))
-	for i, value := range in {
-		out[i] = value
+func ConvertInt64ToInterface(src []int64) []interface{} {
+	dst := make([]interface{}, len(src))
+	for i, value := range src {
+		dst[i] = value
 	}
-	return out
+	return dst
 }
 
 // AppendInt64ToInterface generics helper.
-func AppendInt64ToInterface(out []interface{}, in ...int64) []interface{} {
-	for _, value := range in {
-		out = append(out, value)
+func AppendInt64ToInterface(dst []interface{}, src ...int64) []interface{} {
+	for _, value := range src {
+		dst = append(dst, value)
 	}
-	return out
+	return dst
 }
 
 // ConvertUint64ToInterface generics helper.
-func ConvertUint64ToInterface(in []uint64) []interface{} {
-	out := make([]interface{}, len(in))
-	for i, value := range in {
-		out[i] = value
+func ConvertUint64ToInterface(src []uint64) []interface{} {
+	dst := make([]interface{}, len(src))
+	for i, value := range src {
+		dst[i] = value
 	}
-	return out
+	return dst
 }
 
 // AppendUint64ToInterface generics helper.
-func AppendUint64ToInterface(out []interface{}, in ...uint64) []interface{} {
-	for _, value := range in {
-		out = append(out, value)
+func AppendUint64ToInterface(dst []interface{}, src ...uint64) []interface{} {
+	for _, value := range src {
+		dst = append(dst, value)
 	}
-	return out
+	return dst
 }

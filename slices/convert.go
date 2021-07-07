@@ -2,23 +2,24 @@ package slices
 
 import "github.com/cheekybits/genny/generic"
 
-//go:generate genny -in=$GOFILE -out=convert_gen.go gen "Any=string,int,int64,uint64"
+//go:generate genny -in=$GOFILE -out=convert_gen.go gen "SrcType=string,int,int64,uint64 DstType=interface{}"
 
-type Any generic.Type
+type SrcType generic.Type
+type DstType generic.Type
 
-// ConvertAnyToInterface generics helper.
-func ConvertAnyToInterface(in []Any) []interface{} {
-	out := make([]interface{}, len(in))
-	for i, value := range in {
-		out[i] = value
+// ConvertSrcTypeToDstType generics helper.
+func ConvertSrcTypeToDstType(src []SrcType) []DstType {
+	dst := make([]DstType, len(src))
+	for i, value := range src {
+		dst[i] = value
 	}
-	return out
+	return dst
 }
 
-// AppendAnyToInterface generics helper.
-func AppendAnyToInterface(out []interface{}, in ...Any) []interface{} {
-	for _, value := range in {
-		out = append(out, value)
+// AppendSrcTypeToDstType generics helper.
+func AppendSrcTypeToDstType(dst []DstType, src ...SrcType) []DstType {
+	for _, value := range src {
+		dst = append(dst, value)
 	}
-	return out
+	return dst
 }

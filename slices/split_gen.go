@@ -5,69 +5,69 @@
 package slices
 
 // SplitString splits a slice into parts of a given length, with a remainder if necessary.
-func SplitString(in []string, partLen int) [][]string {
-	inLen := len(in)
-	if inLen == 0 {
+func SplitString(src []string, partLen int) [][]string {
+	srcLen := len(src)
+	if srcLen == 0 {
 		return nil
 	}
-	var out [][]string
-	for a := 0; a < inLen; a += partLen {
+	var dst [][]string
+	for a := 0; a < srcLen; a += partLen {
 		z := a + partLen
-		if z > inLen {
-			z = inLen
+		if z > srcLen {
+			z = srcLen
 		}
-		out = append(out, in[a:z])
+		dst = append(dst, src[a:z])
 	}
-	return out
+	return dst
 }
 
 // SplitInt splits a slice into parts of a given length, with a remainder if necessary.
-func SplitInt(in []int, partLen int) [][]int {
-	inLen := len(in)
-	if inLen == 0 {
+func SplitInt(src []int, partLen int) [][]int {
+	srcLen := len(src)
+	if srcLen == 0 {
 		return nil
 	}
-	var out [][]int
-	for a := 0; a < inLen; a += partLen {
+	var dst [][]int
+	for a := 0; a < srcLen; a += partLen {
 		z := a + partLen
-		if z > inLen {
-			z = inLen
+		if z > srcLen {
+			z = srcLen
 		}
-		out = append(out, in[a:z])
+		dst = append(dst, src[a:z])
 	}
-	return out
+	return dst
 }
 
 // SplitInt64 splits a slice into parts of a given length, with a remainder if necessary.
-func SplitInt64(in []int64, partLen int) [][]int64 {
-	inLen := len(in)
-	if inLen == 0 {
+func SplitInt64(src []int64, partLen int) [][]int64 {
+	srcLen := len(src)
+	if srcLen == 0 {
 		return nil
 	}
-	var out [][]int64
-	for a := 0; a < inLen; a += partLen {
+	var dst [][]int64
+	for a := 0; a < srcLen; a += partLen {
 		z := a + partLen
-		if z > inLen {
-			z = inLen
+		if z > srcLen {
+			z = srcLen
 		}
-		out = append(out, in[a:z])
+		dst = append(dst, src[a:z])
 	}
-	return out
+	return dst
 }
 
 // SplitUint64 splits a slice into parts of a given length, with a remainder if necessary.
-func SplitUint64(in []uint64, partLen int) [][]uint64 {
-	inLen := len(in)
-	if inLen == 0 {
+func SplitUint64(src []uint64, partLen int) [][]uint64 {
+	srcLen := len(src)
+	if srcLen == 0 {
 		return nil
 	}
-	var out [][]uint64
-	for a := 0; a < inLen; a += partLen {
+	var dst [][]uint64
+	for a := 0; a < srcLen; a += partLen {
 		z := a + partLen
-		if z > inLen {
-			z = inLen
+		if z > srcLen {
+			z = srcLen
 		}
-		out = append(out, in[a:z])
+		dst = append(dst, src[a:z])
 	}
-	return out
+	return dst
 }
