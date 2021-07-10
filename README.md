@@ -98,27 +98,32 @@ func main() {
 }
 ```
 
+## sets
+
+Generated code of sets based on a map of type-to-bools for a range of standard go types.
+
+Generics in Go would be nice, but here we are.
+
+* Contains
+* ContainsAny
+* ContainsAll
+* SubsetOf
+* Union
+* Intersection
+* Difference
+* Ordered
+* MarshalJSON
+* UnmarshalJSON
+
 ## slices
 
-Split slices into parts. My kingdom for generics in Go!
+Generated code of common slice operations based on standard go types.
 
-```go
-import "github.com/tomcz/gotools/slices"
+Generics in Go would be nice, but here we are.
 
-in := []int{
-    1, 2, 3,
-    4, 5, 6,
-    7, 8, 9,
-    10,
-}
-expected := [][]int{
-    {1, 2, 3},
-    {4, 5, 6},
-    {7, 8, 9},
-    {10},
-}
-assert.Equal(t, expected, slices.SplitInt(in, 3))
-```
+* Split splits a slice into parts of a given length, with a remainder if necessary.
+* ConvertToInterface converts a slice of one type to a slice of `interface{}`.
+* AppendToInterface appends the contents of a slice to a slice of `interface{}`.
 
 ## sqls
 
@@ -131,9 +136,10 @@ selectLeadersSQL = "select leader, node from current_leaders"
 insertLeaderSQL = "insert into old_leaders (leader, node, created_at) values (?, ?, ?)"
 
 ctx := context.Background()
-results := make(map[string]string)
+
 var db *sql.DB // initialisation omitted
 
+results := make(map[string]string)
 err := sqls.QueryRowsContext(ctx, db, selectLeadersSQL)(func(row sqls.ScanFunc) error {
     var leader, node string
     if err := row(&leader, &node); err != nil {
