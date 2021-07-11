@@ -14,8 +14,8 @@ import (
 
 type Something generic.Number
 
-// SomethingSet adds set semantics to a map of Something to bool values.
-type SomethingSet map[Something]bool
+// SomethingSet represents a unique collection of Something values.
+type SomethingSet map[Something]struct{}
 
 var _ json.Marshaler = SomethingSet{}
 var _ json.Unmarshaler = &SomethingSet{}
@@ -29,7 +29,8 @@ func NewSomethingSet(values ...Something) SomethingSet {
 
 // Contains returns true if this set contains the given value.
 func (s SomethingSet) Contains(value Something) bool {
-	return s[value]
+	_, found := s[value]
+	return found
 }
 
 // ContainsAny returns true if this set contains any value in the slice.
@@ -64,7 +65,7 @@ func (s SomethingSet) SubsetOf(o SomethingSet) bool {
 
 // Add adds a single value to this set.
 func (s SomethingSet) Add(value Something) {
-	s[value] = true
+	s[value] = struct{}{}
 }
 
 // AddAll adds multiple values to this set.

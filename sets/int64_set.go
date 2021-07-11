@@ -9,8 +9,8 @@ import (
 	"sort"
 )
 
-// Int64Set adds set semantics to a map of int64 to bool values.
-type Int64Set map[int64]bool
+// Int64Set represents a unique collection of int64 values.
+type Int64Set map[int64]struct{}
 
 var _ json.Marshaler = Int64Set{}
 var _ json.Unmarshaler = &Int64Set{}
@@ -24,7 +24,8 @@ func NewInt64Set(values ...int64) Int64Set {
 
 // Contains returns true if this set contains the given value.
 func (s Int64Set) Contains(value int64) bool {
-	return s[value]
+	_, found := s[value]
+	return found
 }
 
 // ContainsAny returns true if this set contains any value in the slice.
@@ -59,7 +60,7 @@ func (s Int64Set) SubsetOf(o Int64Set) bool {
 
 // Add adds a single value to this set.
 func (s Int64Set) Add(value int64) {
-	s[value] = true
+	s[value] = struct{}{}
 }
 
 // AddAll adds multiple values to this set.

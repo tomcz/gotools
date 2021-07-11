@@ -107,7 +107,7 @@ func main() {
 
 Generics in Go would be nice, but here we are.
 
-Generated code of sets based on a map of type-to-bools for a range of standard go types.
+Generated code of sets for a range of standard go types.
 
 * Contains
 * ContainsAny

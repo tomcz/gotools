@@ -9,8 +9,8 @@ import (
 	"sort"
 )
 
-// IntSet adds set semantics to a map of int to bool values.
-type IntSet map[int]bool
+// IntSet represents a unique collection of int values.
+type IntSet map[int]struct{}
 
 var _ json.Marshaler = IntSet{}
 var _ json.Unmarshaler = &IntSet{}
@@ -24,7 +24,8 @@ func NewIntSet(values ...int) IntSet {
 
 // Contains returns true if this set contains the given value.
 func (s IntSet) Contains(value int) bool {
-	return s[value]
+	_, found := s[value]
+	return found
 }
 
 // ContainsAny returns true if this set contains any value in the slice.
@@ -59,7 +60,7 @@ func (s IntSet) SubsetOf(o IntSet) bool {
 
 // Add adds a single value to this set.
 func (s IntSet) Add(value int) {
-	s[value] = true
+	s[value] = struct{}{}
 }
 
 // AddAll adds multiple values to this set.

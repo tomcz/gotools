@@ -9,8 +9,8 @@ import (
 	"sort"
 )
 
-// StringSet adds set semantics to a map of string to bool values.
-type StringSet map[string]bool
+// StringSet represents a unique collection of string values.
+type StringSet map[string]struct{}
 
 var _ json.Marshaler = StringSet{}
 var _ json.Unmarshaler = &StringSet{}
@@ -24,7 +24,8 @@ func NewStringSet(values ...string) StringSet {
 
 // Contains returns true if this set contains the given value.
 func (s StringSet) Contains(value string) bool {
-	return s[value]
+	_, found := s[value]
+	return found
 }
 
 // ContainsAny returns true if this set contains any value in the slice.
@@ -59,7 +60,7 @@ func (s StringSet) SubsetOf(o StringSet) bool {
 
 // Add adds a single value to this set.
 func (s StringSet) Add(value string) {
-	s[value] = true
+	s[value] = struct{}{}
 }
 
 // AddAll adds multiple values to this set.
