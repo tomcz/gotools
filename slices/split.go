@@ -2,7 +2,10 @@ package slices
 
 import "github.com/cheekybits/genny/generic"
 
-//go:generate genny -in=$GOFILE -out=split_gen.go gen "Slice=string,int,int64,uint64"
+//go:generate genny -in=$GOFILE -out=split_int.go     gen "Slice=int"
+//go:generate genny -in=$GOFILE -out=split_int64.go   gen "Slice=int64"
+//go:generate genny -in=$GOFILE -out=split_uint64.go  gen "Slice=uint64"
+//go:generate genny -in=$GOFILE -out=split_strings.go gen "Slice=string"
 
 type Slice generic.Type
 

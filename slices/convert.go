@@ -2,7 +2,10 @@ package slices
 
 import "github.com/cheekybits/genny/generic"
 
-//go:generate genny -in=$GOFILE -out=convert_gen.go gen "Source=string,int,int64,uint64"
+//go:generate genny -in=$GOFILE -out=convert_int.go     gen "Source=int"
+//go:generate genny -in=$GOFILE -out=convert_int64.go   gen "Source=int64"
+//go:generate genny -in=$GOFILE -out=convert_uint64.go  gen "Source=uint64"
+//go:generate genny -in=$GOFILE -out=convert_strings.go gen "Source=string"
 
 type Source generic.Type
 
