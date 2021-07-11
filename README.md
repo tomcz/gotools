@@ -105,9 +105,9 @@ func main() {
 
 ## sets
 
-Generated code of sets based on a map of type-to-bools for a range of standard go types.
-
 Generics in Go would be nice, but here we are.
+
+Generated code of sets based on a map of type-to-bools for a range of standard go types.
 
 * Contains
 * ContainsAny
@@ -122,9 +122,9 @@ Generics in Go would be nice, but here we are.
 
 ## slices
 
-Generated code of common slice operations based on standard go types.
-
 Generics in Go would be nice, but here we are.
+
+Generated code of common slice operations based on standard go types.
 
 * `Split[X]` splits a slice into parts of a given length, with a remainder if necessary.
 * `Convert[X]ToInterface` converts a slice of one type to a slice of `interface{}`.
