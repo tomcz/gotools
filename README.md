@@ -65,6 +65,11 @@ func main() {
 
     go func() {
         for {
+            // This blocks until either cancelled or there is a
+            // database error. In the event of database errors
+            // you can decide to fail the application or do what
+            // this example code does and kick off the elections
+            // again after handling the error however you want.
             err := check.StartElections(ctx)
             if errors.Is(err, context.Canceled) {
                 log.Println("shutting down elections")
