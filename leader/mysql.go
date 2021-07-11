@@ -124,12 +124,9 @@ func (m *mysqlLeader) election() func(context.Context) error {
 // to call the CreateMysqlLeaderTable function.
 const CreateMysqlLeaderSQL = `
 CREATE TABLE IF NOT EXISTS leader_election (
-  id          int unsigned NOT NULL AUTO_INCREMENT,
-  leader_name varchar(255) NOT NULL,
+  leader_name varchar(255) NOT NULL PRIMARY KEY,
   node_name   varchar(255) NOT NULL,
-  last_update datetime     NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY  unique_leader_name (leader_name)
+  last_update datetime     NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 `
 
