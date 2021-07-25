@@ -63,24 +63,28 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 	if leader.nodeName == "" {
 		leader.nodeName = uuid.New().String()
 	}
-	if leader.tick < time.Second {
+	if leader.tick < time.Nanosecond {
 		leader.tick = 15 * time.Second
 	}
-	if leader.age < time.Second {
+	if leader.age < time.Nanosecond {
 		leader.age = 60 * time.Second
 	}
 	return leader
 }
 
-func (m *mysqlLeader) StartElections(ctx context.Context) error {
+func (m *mysqlLeader) RunElections(ctx context.Context, onError OnError) error {
 	election := m.election()
 	ticker := m.clock.Ticker(m.tick)
 	defer ticker.Stop()
 	for {
 		select {
 		case <-ticker.C:
-			if err := election(ctx); err != nil {
-				return err
+			err := election(ctx)
+			if err != nil {
+				err = onError(err)
+				if err != nil {
+					return err
+				}
 			}
 		case <-ctx.Done():
 			return ctx.Err()

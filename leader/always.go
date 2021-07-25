@@ -10,11 +10,11 @@ func NewAlwaysLeader() Leader {
 	return alwaysLeader{}
 }
 
-func (a alwaysLeader) IsLeader(ctx context.Context) (bool, error) {
+func (a alwaysLeader) IsLeader(context.Context) (bool, error) {
 	return true, nil
 }
 
-func (a alwaysLeader) StartElections(ctx context.Context) error {
+func (a alwaysLeader) RunElections(ctx context.Context, _ OnError) error {
 	<-ctx.Done()
 	return ctx.Err()
 }

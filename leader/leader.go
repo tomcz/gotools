@@ -8,12 +8,13 @@ import "context"
 // unaware which node will serve as the "leader" (or coordinator) of the task,
 // or unable to communicate with the current coordinator. After a leader election
 // algorithm has been run, however, each node throughout the network recognizes
-//  a particular, unique node as the task leader.
+// a particular, unique node as the task leader.
 type Leader interface {
 	// IsLeader returns whether this node is the leader, or an error if it was
 	// unable to determine if it is the leader for any reason.
 	IsLeader(ctx context.Context) (bool, error)
-	// StartElections is a blocking call. It should exit when the context is
-	// cancelled or if there is an error in running the election algorithm.
-	StartElections(ctx context.Context) error
+	// RunElections is a blocking call. It should exit when the context is
+	// cancelled, or when an error occurs during the election and the OnError
+	// strategy indicates an end to elections.
+	RunElections(ctx context.Context, onError OnError) error
 }
