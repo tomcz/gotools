@@ -124,8 +124,8 @@ func (s IntSet) Difference(o IntSet) IntSet {
 	return ret
 }
 
-// Ordered returns an ordered slice of values from this set.
-func (s IntSet) Ordered() []int {
+// Sorted returns a sorted slice of values from this set.
+func (s IntSet) Sorted() []int {
 	ret := make([]int, 0, len(s))
 	for value := range s {
 		ret = append(ret, value)
@@ -140,7 +140,7 @@ func (s IntSet) Ordered() []int {
 func (s IntSet) MarshalJSON() ([]byte, error) {
 	var values []int
 	if s != nil {
-		values = s.Ordered()
+		values = s.Sorted()
 	}
 	return json.Marshal(values)
 }

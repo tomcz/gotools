@@ -124,8 +124,8 @@ func (s StringSet) Difference(o StringSet) StringSet {
 	return ret
 }
 
-// Ordered returns an ordered slice of values from this set.
-func (s StringSet) Ordered() []string {
+// Sorted returns a sorted slice of values from this set.
+func (s StringSet) Sorted() []string {
 	ret := make([]string, 0, len(s))
 	for value := range s {
 		ret = append(ret, value)
@@ -140,7 +140,7 @@ func (s StringSet) Ordered() []string {
 func (s StringSet) MarshalJSON() ([]byte, error) {
 	var values []string
 	if s != nil {
-		values = s.Ordered()
+		values = s.Sorted()
 	}
 	return json.Marshal(values)
 }

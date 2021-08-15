@@ -124,8 +124,8 @@ func (s Int64Set) Difference(o Int64Set) Int64Set {
 	return ret
 }
 
-// Ordered returns an ordered slice of values from this set.
-func (s Int64Set) Ordered() []int64 {
+// Sorted returns a sorted slice of values from this set.
+func (s Int64Set) Sorted() []int64 {
 	ret := make([]int64, 0, len(s))
 	for value := range s {
 		ret = append(ret, value)
@@ -140,7 +140,7 @@ func (s Int64Set) Ordered() []int64 {
 func (s Int64Set) MarshalJSON() ([]byte, error) {
 	var values []int64
 	if s != nil {
-		values = s.Ordered()
+		values = s.Sorted()
 	}
 	return json.Marshal(values)
 }

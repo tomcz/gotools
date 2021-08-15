@@ -10,7 +10,7 @@ import (
 func TestSet(t *testing.T) {
 	set := NewSomethingSet(1, 2, 3, 3, 4, 5, 5, 6)
 
-	assert.Equal(t, []Something{1, 2, 3, 4, 5, 6}, set.Ordered())
+	assert.Equal(t, []Something{1, 2, 3, 4, 5, 6}, set.Sorted())
 
 	assert.True(t, set.Contains(2))
 	assert.False(t, set.Contains(10))
@@ -24,15 +24,15 @@ func TestSet(t *testing.T) {
 	assert.True(t, set.SubsetOf(NewSomethingSet(1, 2, 3, 4, 5, 6, 7, 8, 9)))
 	assert.False(t, set.SubsetOf(NewSomethingSet(2, 3, 4, 5, 6, 7, 8, 9)))
 
-	assert.Equal(t, []Something{1, 2, 3, 4, 5, 6, 7, 8}, set.Union(NewSomethingSet(5, 6, 7, 8)).Ordered())
-	assert.Equal(t, []Something{1, 2, 3, 4}, set.Difference(NewSomethingSet(5, 6, 7, 8)).Ordered())
-	assert.Equal(t, []Something{5, 6}, set.Intersection(NewSomethingSet(5, 6, 7, 8)).Ordered())
+	assert.Equal(t, []Something{1, 2, 3, 4, 5, 6, 7, 8}, set.Union(NewSomethingSet(5, 6, 7, 8)).Sorted())
+	assert.Equal(t, []Something{1, 2, 3, 4}, set.Difference(NewSomethingSet(5, 6, 7, 8)).Sorted())
+	assert.Equal(t, []Something{5, 6}, set.Intersection(NewSomethingSet(5, 6, 7, 8)).Sorted())
 
 	var dst SomethingSet
 	const txt = `[1, 2, 3, 3, 4, 5, 5, 6]`
 	err := json.Unmarshal([]byte(txt), &dst)
 	if assert.NoError(t, err) {
-		assert.Equal(t, []Something{1, 2, 3, 4, 5, 6}, dst.Ordered())
+		assert.Equal(t, []Something{1, 2, 3, 4, 5, 6}, dst.Sorted())
 	}
 
 	buf, err := json.Marshal(set)
