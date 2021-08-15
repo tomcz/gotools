@@ -116,7 +116,7 @@ Generated code of sets for a range of standard go types.
 * Union
 * Intersection
 * Difference
-* Ordered
+* Sorted
 * MarshalJSON
 * UnmarshalJSON
 
