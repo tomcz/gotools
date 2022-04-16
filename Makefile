@@ -9,21 +9,21 @@ build: lint test
 .PHONY: generate
 generate:
 ifeq (, $(shell which genny))
-	go get github.com/cheekybits/genny
+	go install github.com/cheekybits/genny@latest
 endif
 	go generate ./...
 
 .PHONY: format
 format:
 ifeq (, $(shell which goimports))
-	go get golang.org/x/tools/cmd/goimports
+	go install golang.org/x/tools/cmd/goimports@latest
 endif
 	goimports -w -local github.com/tomcz/gotools .
 
 .PHONY: lint
 lint:
 ifeq (, $(shell which staticcheck))
-	go install honnef.co/go/tools/cmd/staticcheck@2021.1
+	go install honnef.co/go/tools/cmd/staticcheck@latest
 endif
 	staticcheck ./...
 
