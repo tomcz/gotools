@@ -9,17 +9,17 @@ import "github.com/cheekybits/genny/generic"
 
 type Source generic.Type
 
-// ConvertSourceToInterface generics helper.
-func ConvertSourceToInterface(src []Source) []interface{} {
-	dst := make([]interface{}, len(src))
+// ConvertSourceToAny generics helper.
+func ConvertSourceToAny(src []Source) []any {
+	dst := make([]any, len(src))
 	for i, value := range src {
 		dst[i] = value
 	}
 	return dst
 }
 
-// AppendSourceToInterface generics helper.
-func AppendSourceToInterface(dst []interface{}, src ...Source) []interface{} {
+// AppendSourceToAny generics helper.
+func AppendSourceToAny(dst []any, src ...Source) []any {
 	for _, value := range src {
 		dst = append(dst, value)
 	}

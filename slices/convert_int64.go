@@ -4,17 +4,17 @@
 
 package slices
 
-// ConvertInt64ToInterface generics helper.
-func ConvertInt64ToInterface(src []int64) []interface{} {
-	dst := make([]interface{}, len(src))
+// ConvertInt64ToAny generics helper.
+func ConvertInt64ToAny(src []int64) []any {
+	dst := make([]any, len(src))
 	for i, value := range src {
 		dst[i] = value
 	}
 	return dst
 }
 
-// AppendInt64ToInterface generics helper.
-func AppendInt64ToInterface(dst []interface{}, src ...int64) []interface{} {
+// AppendInt64ToAny generics helper.
+func AppendInt64ToAny(dst []any, src ...int64) []any {
 	for _, value := range src {
 		dst = append(dst, value)
 	}

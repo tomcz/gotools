@@ -4,17 +4,17 @@
 
 package slices
 
-// ConvertStringToInterface generics helper.
-func ConvertStringToInterface(src []string) []interface{} {
-	dst := make([]interface{}, len(src))
+// ConvertStringToAny generics helper.
+func ConvertStringToAny(src []string) []any {
+	dst := make([]any, len(src))
 	for i, value := range src {
 		dst[i] = value
 	}
 	return dst
 }
 
-// AppendStringToInterface generics helper.
-func AppendStringToInterface(dst []interface{}, src ...string) []interface{} {
+// AppendStringToAny generics helper.
+func AppendStringToAny(dst []any, src ...string) []any {
 	for _, value := range src {
 		dst = append(dst, value)
 	}

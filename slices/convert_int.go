@@ -4,17 +4,17 @@
 
 package slices
 
-// ConvertIntToInterface generics helper.
-func ConvertIntToInterface(src []int) []interface{} {
-	dst := make([]interface{}, len(src))
+// ConvertIntToAny generics helper.
+func ConvertIntToAny(src []int) []any {
+	dst := make([]any, len(src))
 	for i, value := range src {
 		dst[i] = value
 	}
 	return dst
 }
 
-// AppendIntToInterface generics helper.
-func AppendIntToInterface(dst []interface{}, src ...int) []interface{} {
+// AppendIntToAny generics helper.
+func AppendIntToAny(dst []any, src ...int) []any {
 	for _, value := range src {
 		dst = append(dst, value)
 	}

@@ -11,7 +11,7 @@ import (
 // PopulateFromEnv populates the target using environment variables and
 // mapstructure (https://github.com/mitchellh/mapstructure) mappings.
 // Please note that the target must be a pointer to a struct.
-func PopulateFromEnv(target interface{}) error {
+func PopulateFromEnv(target any) error {
 	r := reflect.TypeOf(target)
 	if r.Kind() != reflect.Ptr {
 		return errors.New("target must be a pointer")
