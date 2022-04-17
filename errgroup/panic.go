@@ -41,11 +41,11 @@ func (p *panicGroup) Go(f func() error) {
 	p.group.Go(func() (err error) {
 		defer func() {
 			if r := recover(); r != nil {
-				stack := debug.Stack()
+				stack := string(debug.Stack())
 				if ex, ok := r.(error); ok {
-					err = fmt.Errorf("panic: %w; stack: %s", ex, string(stack))
+					err = fmt.Errorf("panic: %w; stack: %s", ex, stack)
 				} else {
-					err = fmt.Errorf("panic: %v; stack: %s", r, string(stack))
+					err = fmt.Errorf("panic: %v; stack: %s", r, stack)
 				}
 			}
 		}()
