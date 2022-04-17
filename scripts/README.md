@@ -1,3 +1,3 @@
 # scripts
 
-Scripts for the `go-build` GitHub action.
+Scripts for the `make docker` Makefile target.
