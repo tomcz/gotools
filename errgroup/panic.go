@@ -19,7 +19,8 @@ type panicGroup struct {
 	group *errgroup.Group
 }
 
-// New creates a panic-handling Group.
+// New creates a panic-handling Group,
+// without any context cancellation.
 func New() Group {
 	group := &errgroup.Group{}
 	return &panicGroup{group}
