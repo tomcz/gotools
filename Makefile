@@ -1,10 +1,8 @@
 BASE_DIR ?= $(shell git rev-parse --show-toplevel 2>/dev/null)
 
 .PHONY: precommit
-precommit: generate format build
+precommit: generate format lint test
 
-.PHONY: build
-build: lint test
 
 .PHONY: generate
 generate:
@@ -61,5 +59,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.16                  \
-		make build
+		-t golang:1.18                  \
+		make test
