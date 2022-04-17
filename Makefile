@@ -1,7 +1,7 @@
 BASE_DIR ?= $(shell git rev-parse --show-toplevel 2>/dev/null)
 
 .PHONY: precommit
-precommit: format build
+precommit: generate format build
 
 .PHONY: build
 build: lint test
