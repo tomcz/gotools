@@ -79,10 +79,8 @@ func (m *mysqlLeader) RunElections(ctx context.Context, onError OnError) error {
 	for {
 		select {
 		case <-ticker.C:
-			err := election(ctx)
-			if err != nil {
-				err = onError(err)
-				if err != nil {
+			if err := election(ctx); err != nil {
+				if err = onError(err); err != nil {
 					return err
 				}
 			}
