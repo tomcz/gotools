@@ -37,6 +37,28 @@ func WithAge(age time.Duration) MysqlOpt {
 	}
 }
 
+// WithClock replaces the default system clock.
+func WithClock(ck clock.Clock) MysqlOpt {
+	return func(leader *mysqlLeader) {
+		leader.clock = ck
+	}
+}
+
+// WithOnError allows the default strategy of
+// terminating leadership elections on errors
+// during the Leader.Acquire blocking call to
+// be replaced with something more nuanced.
+// If the onError strategy returns a non-nil
+// error value, the blocking call will exit
+// with the returned error. If the strategy
+// returns a nil value, leadership election
+// will continue on the next clock tick.
+func WithOnError(onError func(error) error) MysqlOpt {
+	return func(leader *mysqlLeader) {
+		leader.onError = onError
+	}
+}
+
 type mysqlLeader struct {
 	db         *sql.DB
 	leaderName string
@@ -44,6 +66,7 @@ type mysqlLeader struct {
 	clock      clock.Clock
 	tick       time.Duration
 	age        time.Duration
+	onError    func(error) error
 }
 
 // NewMysqlLeader provides an implementation of the Leader interface using
@@ -52,27 +75,29 @@ type mysqlLeader struct {
 // that tasks that require leadership election do not run for longer than
 // either the tick or age intervals.
 func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
-	leader := &mysqlLeader{
-		db:         db,
-		leaderName: leaderName,
-		clock:      clock.New(),
-	}
+	leader := &mysqlLeader{db: db, leaderName: leaderName}
 	for _, opt := range opts {
 		opt(leader)
 	}
 	if leader.nodeName == "" {
 		leader.nodeName = uuid.New().String()
 	}
-	if leader.tick < time.Nanosecond {
+	if leader.clock == nil {
+		leader.clock = clock.New()
+	}
+	if leader.tick < time.Second {
 		leader.tick = 15 * time.Second
 	}
-	if leader.age < time.Nanosecond {
+	if leader.age < time.Second {
 		leader.age = 60 * time.Second
+	}
+	if leader.onError == nil {
+		leader.onError = abortOnError
 	}
 	return leader
 }
 
-func (m *mysqlLeader) RunElections(ctx context.Context, onError OnError) error {
+func (m *mysqlLeader) Acquire(ctx context.Context) error {
 	election := m.election()
 	ticker := m.clock.Ticker(m.tick)
 	defer ticker.Stop()
@@ -80,7 +105,7 @@ func (m *mysqlLeader) RunElections(ctx context.Context, onError OnError) error {
 		select {
 		case <-ticker.C:
 			if err := election(ctx); err != nil {
-				if err = onError(err); err != nil {
+				if err = m.onError(err); err != nil {
 					return err
 				}
 			}
@@ -119,6 +144,10 @@ func (m *mysqlLeader) election() func(context.Context) error {
 		_, err := m.db.ExecContext(ctx, stmt, m.leaderName, m.nodeName, m.clock.Now())
 		return err
 	}
+}
+
+func abortOnError(err error) error {
+	return err
 }
 
 // CreateMysqlLeaderSQL is the create statement used by CreateMysqlLeaderTable.

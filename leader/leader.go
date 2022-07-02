@@ -13,8 +13,22 @@ type Leader interface {
 	// IsLeader returns whether this node is the leader, or an error if it was
 	// unable to determine if it is the leader for any reason.
 	IsLeader(ctx context.Context) (bool, error)
-	// RunElections is a blocking call. It should exit when the context is
-	// cancelled, or when an error occurs during the election and the OnError
-	// strategy indicates an end to elections.
-	RunElections(ctx context.Context, onError OnError) error
+	// Acquire leadership blocking call. It should exit when the context is
+	// cancelled, or when the implementation determines that the leadership
+	// election process should terminate.
+	Acquire(ctx context.Context) error
+}
+
+// AlwaysLeader is an implementation that always considers itself the leader.
+type AlwaysLeader struct{}
+
+// IsLeader always returns true.
+func (a AlwaysLeader) IsLeader(context.Context) (bool, error) {
+	return true, nil
+}
+
+// Acquire blocks until the context is cancelled.
+func (a AlwaysLeader) Acquire(ctx context.Context) error {
+	<-ctx.Done()
+	return ctx.Err()
 }

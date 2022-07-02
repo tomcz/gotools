@@ -20,7 +20,7 @@ import (
 func main() {
 	var db *sql.DB // initialisation omitted
 
-	mysqlLeader := leader.NewMysqlLeader(db, "app_leader")
+	node := leader.NewMysqlLeader(db, "app_leader")
 
 	ctx, cancelElections := context.WithCancel(context.Background())
 
@@ -28,7 +28,7 @@ func main() {
 	wg.Add(1)
 
 	go func() {
-		err := mysqlLeader.RunElections(ctx, leader.ContinueOnError)
+		err := node.Acquire(ctx)
 		if errors.Is(err, context.Canceled) {
 			log.Println("elections canceled")
 		} else {
@@ -42,7 +42,7 @@ func main() {
 			if i > 0 {
 				time.Sleep(time.Second)
 			}
-			isLeader, err := mysqlLeader.IsLeader(ctx)
+			isLeader, err := node.IsLeader(ctx)
 			if err != nil {
 				log.Println("leader check failed:", err)
 				continue
