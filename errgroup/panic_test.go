@@ -2,7 +2,6 @@ package errgroup
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -57,6 +56,6 @@ func TestGroupPanicError(t *testing.T) {
 	})
 	err := group.Wait()
 	if assert.Error(t, err) {
-		assert.True(t, errors.Is(err, cause), err.Error())
+		assert.ErrorIs(t, err, cause)
 	}
 }
