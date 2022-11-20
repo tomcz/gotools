@@ -23,6 +23,14 @@ func TestGenericSets(t *testing.T) {
 	assert.True(t, SubsetOf(set, NewSet(1, 2, 3, 4, 5, 6, 7, 8, 9)))
 	assert.False(t, SubsetOf(set, NewSet(2, 3, 4, 5, 6, 7, 8, 9)))
 
+	AddAll(set, true, 101, 102, 103)
+	expected := []int{1, 2, 3, 4, 5, 6, 101, 102, 103}
+	assert.Equal(t, expected, SortedKeys(set))
+
+	RemoveAll(set, 101, 102, 103)
+	expected = []int{1, 2, 3, 4, 5, 6}
+	assert.Equal(t, expected, SortedKeys(set))
+
 	assert.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8}, SortedKeys(Union(set, NewSet(5, 6, 7, 8))))
 	assert.Equal(t, []int{1, 2, 3, 4}, SortedKeys(Difference(set, NewSet(5, 6, 7, 8))))
 	assert.Equal(t, []int{5, 6}, SortedKeys(Intersection(set, NewSet(5, 6, 7, 8))))
