@@ -2,12 +2,11 @@ package maps
 
 // NewSet creates a new set.
 func NewSet[K comparable](keys ...K) map[K]bool {
-	return NewSetFromSlice(true, keys...)
+	return NewSetWithValue(true, keys...)
 }
 
-// NewSetFromSlice creates a set from the given slice,
-// with each entry given the same sentinel value.
-func NewSetFromSlice[K comparable, V any](value V, keys ...K) map[K]V {
+// NewSetWithValue creates a set with each key given the same value.
+func NewSetWithValue[K comparable, V any](value V, keys ...K) map[K]V {
 	set := make(map[K]V)
 	for _, key := range keys {
 		set[key] = value
@@ -51,7 +50,7 @@ func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 	return true
 }
 
-// AddAll adds multiple keys to this set with the same sentinel value.
+// AddAll adds multiple keys to this set, each with the same value.
 func AddAll[K comparable, V any](set map[K]V, value V, keys ...K) {
 	for _, key := range keys {
 		set[key] = value
