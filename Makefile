@@ -28,6 +28,10 @@ else
 	go test -cover ./...
 endif
 
+.PHONY: tidy
+tidy:
+	go mod tidy -compat=1.19
+
 COMPOSE_CMD := docker compose -p gotools -f scripts/docker-compose.yml
 
 .PHONY: docker
