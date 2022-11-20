@@ -3,8 +3,6 @@ package sqls
 import (
 	"context"
 	"database/sql"
-
-	"github.com/tomcz/gotools/slices"
 )
 
 // ScanFunc provides an interface for the database/sql/#Rows.Scan
@@ -53,9 +51,4 @@ func QueryRowsContext(ctx context.Context, db *sql.DB, query string, args ...any
 		}
 		return rows.Err()
 	}
-}
-
-// MapToAny performs a type conversion useful for query arguments.
-func MapToAny[A any](src []A) []any {
-	return slices.Map(src, func(a A) any { return a })
 }
