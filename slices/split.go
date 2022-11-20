@@ -1,21 +1,16 @@
 package slices
 
-import "github.com/cheekybits/genny/generic"
-
-//go:generate genny -in=$GOFILE -out=split_int.go     gen "Slice=int"
-//go:generate genny -in=$GOFILE -out=split_int64.go   gen "Slice=int64"
-//go:generate genny -in=$GOFILE -out=split_uint64.go  gen "Slice=uint64"
-//go:generate genny -in=$GOFILE -out=split_strings.go gen "Slice=string"
-
-type Slice generic.Type
-
-// SplitSlice splits a slice into parts of a given length, with a remainder if necessary.
-func SplitSlice(src []Slice, partLen int) [][]Slice {
+// Split given slice into equal sized parts.
+// The last part may have an unequal length
+// if the size of the source slice is not
+// divisible by the required length without
+// leaving a remainder.
+func Split[X any](src []X, partLen int) [][]X {
 	srcLen := len(src)
 	if srcLen == 0 {
 		return nil
 	}
-	var dst [][]Slice
+	var dst [][]X
 	for a := 0; a < srcLen; a += partLen {
 		z := a + partLen
 		if z > srcLen {

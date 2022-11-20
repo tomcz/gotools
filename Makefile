@@ -1,17 +1,10 @@
 BASE_DIR ?= $(shell git rev-parse --show-toplevel 2>/dev/null)
 
 .PHONY: precommit
-precommit: generate format build
+precommit: format build
 
 .PHONY: build
 build: lint test
-
-.PHONY: generate
-generate:
-ifeq (, $(shell which genny))
-	go install github.com/cheekybits/genny@latest
-endif
-	go generate ./...
 
 .PHONY: format
 format:
@@ -35,7 +28,7 @@ else
 	go test -cover ./...
 endif
 
-COMPOSE_CMD := docker-compose -p gotools -f scripts/docker-compose.yml
+COMPOSE_CMD := docker compose -p gotools -f scripts/docker-compose.yml
 
 .PHONY: docker
 docker:
@@ -61,5 +54,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.18                  \
+		-t golang:1.19                  \
 		make test
