@@ -10,19 +10,22 @@ import (
 func TestMap(t *testing.T) {
 	input := []int{1, 2, 3, 4, 5}
 	expected := []uint{1, 2, 3, 4, 5}
-	assert.Equal(t, expected, Map(input, func(x int) uint { return uint(x) }))
+	mapper := func(x int) uint { return uint(x) }
+	assert.Equal(t, expected, Map(input, mapper))
 }
 
 func TestMapErr(t *testing.T) {
 	input := []int{1, 2, 3, 4, 5}
 	expected := []uint{1, 2, 3, 4, 5}
 
-	actual, err := MapErr(input, func(x int) (uint, error) { return uint(x), nil })
+	mapper := func(x int) (uint, error) { return uint(x), nil }
+	actual, err := MapErr(input, mapper)
 	if assert.NoError(t, err) {
 		assert.Equal(t, expected, actual)
 	}
 
-	actual, err = MapErr(input, func(x int) (uint, error) { return uint(x), errors.New("test error") })
+	mapperErr := func(x int) (uint, error) { return uint(x), errors.New("test error") }
+	actual, err = MapErr(input, mapperErr)
 	if assert.EqualError(t, err, "test error") {
 		assert.Nil(t, actual)
 	}
