@@ -41,3 +41,27 @@ func SortedValues[K comparable, V constraints.Ordered](src map[K]V) []V {
 	})
 	return values
 }
+
+// Entry is a key/value tuple representing a map entry.
+type Entry[K comparable, V any] struct {
+	Key K
+	Val V
+}
+
+// Entries returns a randomly-sorted slice of map entries.
+func Entries[K comparable, V any](src map[K]V) []Entry[K, V] {
+	dest := make([]Entry[K, V], 0, len(src))
+	for key, val := range src {
+		dest = append(dest, Entry[K, V]{Key: key, Val: val})
+	}
+	return dest
+}
+
+// SortedEntries returns a slice of map entries sorted by their keys.
+func SortedEntries[K constraints.Ordered, V any](src map[K]V) []Entry[K, V] {
+	entries := Entries(src)
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].Key < entries[j].Key
+	})
+	return entries
+}

@@ -16,4 +16,13 @@ func TestSortedEntries(t *testing.T) {
 	}
 	assert.Equal(t, []string{"1", "2", "3", "4", "5"}, SortedKeys(data))
 	assert.Equal(t, []int{1, 2, 3, 4, 5}, SortedValues(data))
+
+	expected := []Entry[string, int]{
+		{Key: "1", Val: 1},
+		{Key: "2", Val: 2},
+		{Key: "3", Val: 3},
+		{Key: "4", Val: 4},
+		{Key: "5", Val: 5},
+	}
+	assert.Equal(t, expected, SortedEntries(data))
 }
