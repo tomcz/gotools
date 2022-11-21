@@ -65,3 +65,12 @@ func SortedEntries[K constraints.Ordered, V any](src map[K]V) []Entry[K, V] {
 	})
 	return entries
 }
+
+// FromEntries creates a map from a slice of key/value tuples.
+func FromEntries[K comparable, V any](src []Entry[K, V]) map[K]V {
+	dest := make(map[K]V)
+	for _, e := range src {
+		dest[e.Key] = e.Val
+	}
+	return dest
+}

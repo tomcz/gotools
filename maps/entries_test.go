@@ -25,4 +25,5 @@ func TestSortedEntries(t *testing.T) {
 		{Key: "5", Val: 5},
 	}
 	assert.Equal(t, expected, SortedEntries(data))
+	assert.Equal(t, data, FromEntries(expected))
 }
