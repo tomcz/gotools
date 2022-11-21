@@ -1,6 +1,6 @@
 package slices
 
-// Map converts from one type to another.
+// Map converts from one type to another using a mapper function.
 func Map[A any, B any](src []A, mapper func(A) B) []B {
 	dest := make([]B, len(src))
 	for i, val := range src {
@@ -9,7 +9,7 @@ func Map[A any, B any](src []A, mapper func(A) B) []B {
 	return dest
 }
 
-// MapErr allows the conversion to fail for any value that returns an error.
+// MapErr allows the mapper function to fail and returns the failing error.
 func MapErr[A any, B any](src []A, mapper func(A) (B, error)) ([]B, error) {
 	dest := make([]B, len(src))
 	for i, in := range src {

@@ -11,7 +11,7 @@ func GroupBy[K comparable, V any](src []V, keyFn func(V) K) map[K][]V {
 	return dest
 }
 
-// GroupByErr allows the indexing to fail for any value that returns an error.
+// GroupByErr allows the key function to fail and returns the failing error.
 func GroupByErr[K comparable, V any](src []V, keyFn func(V) (K, error)) (map[K][]V, error) {
 	dest := make(map[K][]V)
 	for _, value := range src {
