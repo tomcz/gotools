@@ -22,9 +22,9 @@ func TestReduceErr(t *testing.T) {
 		assert.Equal(t, 10, actual)
 	}
 
-	reducerErr := func(val int, acc int) (int, error) { return 0, errors.New("test error") }
+	reducerErr := func(val int, acc int) (int, error) { return -1, errors.New("test error") }
 	actual, err = ReduceErr(input, 0, reducerErr)
 	if assert.EqualError(t, err, "test error") {
-		assert.Equal(t, 0, actual)
+		assert.Equal(t, -1, actual)
 	}
 }
