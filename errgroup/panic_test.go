@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGroupOK(t *testing.T) {
+func TestGroup_OK(t *testing.T) {
 	group := New()
 	group.Go(func() error {
 		return nil
@@ -16,7 +16,7 @@ func TestGroupOK(t *testing.T) {
 	assert.NoError(t, group.Wait())
 }
 
-func TestGroupError(t *testing.T) {
+func TestGroup_Error(t *testing.T) {
 	group, ctx := WithContext(context.Background())
 	group.Go(func() error {
 		return fmt.Errorf("oops")
@@ -29,7 +29,7 @@ func TestGroupError(t *testing.T) {
 	assert.EqualError(t, err, "oops")
 }
 
-func TestGroupPanic(t *testing.T) {
+func TestGroup_Panic(t *testing.T) {
 	group, ctx := WithContext(context.Background())
 	group.Go(func() error {
 		panic("doh")
@@ -44,7 +44,7 @@ func TestGroupPanic(t *testing.T) {
 	}
 }
 
-func TestGroupPanicError(t *testing.T) {
+func TestGroup_Panic_Error(t *testing.T) {
 	cause := fmt.Errorf("frack")
 	group, ctx := WithContext(context.Background())
 	group.Go(func() error {
@@ -58,4 +58,16 @@ func TestGroupPanicError(t *testing.T) {
 	if assert.Error(t, err) {
 		assert.ErrorIs(t, err, cause)
 	}
+}
+
+func TestGroup_Panic_Handler(t *testing.T) {
+	ph := func(p any) error {
+		return fmt.Errorf("%v handled", p)
+	}
+	group := New()
+	group.OnPanic(ph)
+	group.Go(func() error {
+		panic("mischief")
+	})
+	assert.EqualError(t, group.Wait(), "mischief handled")
 }
