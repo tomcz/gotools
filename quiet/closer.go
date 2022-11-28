@@ -34,11 +34,17 @@ func (c *Closer) AddTimeout(close func(ctx context.Context) error, timeout time.
 	c.closers = append(c.closers, &timeoutCloser{close: close, timeout: timeout})
 }
 
-// Close will call each closer in reverse order to addition.
+// CloseAll will call each closer in reverse order to addition.
 // This mimics the invocation order of defers in a function.
-func (c *Closer) Close() error {
+func (c *Closer) CloseAll() {
 	for i := len(c.closers) - 1; i >= 0; i-- {
 		Close(c.closers[i])
 	}
+}
+
+// Close for io.Closer compatibility.
+// Calls CloseAll and returns nil.
+func (c *Closer) Close() error {
+	c.CloseAll()
 	return nil
 }
