@@ -31,31 +31,31 @@ func TestClose_Quiet(t *testing.T) {
 func TestClose_Error(t *testing.T) {
 	defer SetLogger(nil)
 
-	log := &testLogger{}
-	SetLogger(log)
+	logger := &testLogger{}
+	SetLogger(logger)
 
 	testErr := errors.New("test error")
 	CloseFuncE(func() error { return testErr })
-	assert.Equal(t, testErr, log.err)
+	assert.Equal(t, testErr, logger.err)
 }
 
 func TestClose_Panic(t *testing.T) {
 	defer SetLogger(nil)
 
-	log := &testLogger{}
-	SetLogger(log)
+	logger := &testLogger{}
+	SetLogger(logger)
 
 	testErr := errors.New("test error")
 	CloseFuncE(func() error { panic(testErr) })
-	assert.Equal(t, testErr, log.panic)
+	assert.Equal(t, testErr, logger.panic)
 }
 
 func TestClose_Timeout(t *testing.T) {
 	closed := false
-	close := func(context.Context) error {
+	closer := func(context.Context) error {
 		closed = true
 		return nil
 	}
-	CloseWithTimeout(close, time.Minute)
+	CloseWithTimeout(closer, time.Minute)
 	assert.True(t, closed, "close function was not called")
 }
