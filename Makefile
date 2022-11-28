@@ -8,17 +8,11 @@ build: lint test
 
 .PHONY: format
 format:
-ifeq (, $(shell which goimports))
-	go install golang.org/x/tools/cmd/goimports@latest
-endif
-	goimports -w -local github.com/tomcz/gotools .
+	${BASE_DIR}/scripts/format.sh
 
 .PHONY: lint
 lint:
-ifeq (, $(shell which staticcheck))
-	go install honnef.co/go/tools/cmd/staticcheck@latest
-endif
-	staticcheck ./...
+	${BASE_DIR}/scripts/lint.sh
 
 .PHONY: test
 test:
