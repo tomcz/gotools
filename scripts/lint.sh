@@ -7,7 +7,7 @@ if [[ ! -x "${REVIVE}" ]]; then
     go install github.com/mgechev/revive@latest
 fi
 echo "Running revive ..."
-"${REVIVE}" ./...
+"${REVIVE}" -set_exit_status ./...
 
 STATICCHECK="$(go env GOPATH)/bin/staticcheck"
 if [[ ! -x "${STATICCHECK}" ]]; then
