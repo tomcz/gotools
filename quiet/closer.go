@@ -14,22 +14,22 @@ type Closer struct {
 // enforce interface implementation
 var _ io.Closer = &Closer{}
 
-// Add multiple closers to be invoked by Close.
+// Add multiple closers to be invoked by CloseAll.
 func (c *Closer) Add(closers ...io.Closer) {
 	c.closers = append(c.closers, closers...)
 }
 
-// AddFunc adds a cleanup function to be invoked by Close.
+// AddFunc adds a cleanup function to be invoked by CloseAll.
 func (c *Closer) AddFunc(close func()) {
 	c.closers = append(c.closers, &quietCloser{close})
 }
 
-// AddFuncE adds a cleanup function to be invoked by Close.
+// AddFuncE adds a cleanup function to be invoked by CloseAll.
 func (c *Closer) AddFuncE(close func() error) {
 	c.closers = append(c.closers, &quietCloserE{close})
 }
 
-// AddTimeout adds a shutdown function to be invoked by Close.
+// AddTimeout adds a shutdown function to be invoked by CloseAll.
 func (c *Closer) AddTimeout(close func(ctx context.Context) error, timeout time.Duration) {
 	c.closers = append(c.closers, &timeoutCloser{close: close, timeout: timeout})
 }
