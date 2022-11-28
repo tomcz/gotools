@@ -9,3 +9,4 @@ if [[ ! -x "${GOIMPORTS}" ]]; then
 fi
 
 "${GOIMPORTS}" -w -local github.com/tomcz/gotools .
+

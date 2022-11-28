@@ -24,3 +24,4 @@ if [[ ! -x "${GOSEC}" ]]; then
 fi
 echo "Running gosec ..."
 "${GOSEC}" -quiet -exclude-generated ./...
+
