@@ -1,18 +1,15 @@
 BASE_DIR ?= $(shell git rev-parse --show-toplevel 2>/dev/null)
 
 .PHONY: precommit
-precommit: format build
-
-.PHONY: build
-build: lint test
+precommit: format lint test
 
 .PHONY: format
 format:
-	${BASE_DIR}/scripts/format.sh
+	goimports -w -local github.com/tomcz/gotools .
 
 .PHONY: lint
 lint:
-	${BASE_DIR}/scripts/lint.sh
+	golangci-lint run
 
 .PHONY: test
 test:
