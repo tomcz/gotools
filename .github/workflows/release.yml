@@ -20,7 +20,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           version: v1.50.1
-      - name: Build
+      - name: Test
         run: make test
       - name: Automatic Releases
         uses: marvinpinto/action-automatic-releases@v1.2.1
