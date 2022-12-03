@@ -64,8 +64,7 @@ func TestGroup_Panic_Handler(t *testing.T) {
 	ph := func(p any) error {
 		return fmt.Errorf("%v handled", p)
 	}
-	group := New()
-	group.OnPanic(ph)
+	group := New(WithPanicHandler(ph))
 	group.Go(func() error {
 		panic("mischief")
 	})
