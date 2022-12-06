@@ -42,10 +42,10 @@ func New(opts ...Opt) Group {
 	return pg
 }
 
-// WithContext creates a panic-handling Group.
+// NewContext creates a panic-handling Group.
 // The returned context is cancelled on first error,
 // first panic, or when the Wait function exits.
-func WithContext(ctx context.Context, opts ...Opt) (Group, context.Context) {
+func NewContext(ctx context.Context, opts ...Opt) (Group, context.Context) {
 	group, ctx := errgroup.WithContext(ctx)
 	pg := &panicGroup{group: group}
 	pg.configure(opts)

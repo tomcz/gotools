@@ -17,7 +17,7 @@ func TestGroup_OK(t *testing.T) {
 }
 
 func TestGroup_Error(t *testing.T) {
-	group, ctx := WithContext(context.Background())
+	group, ctx := NewContext(context.Background())
 	group.Go(func() error {
 		return fmt.Errorf("oops")
 	})
@@ -30,7 +30,7 @@ func TestGroup_Error(t *testing.T) {
 }
 
 func TestGroup_Panic(t *testing.T) {
-	group, ctx := WithContext(context.Background())
+	group, ctx := NewContext(context.Background())
 	group.Go(func() error {
 		panic("doh")
 	})
@@ -46,7 +46,7 @@ func TestGroup_Panic(t *testing.T) {
 
 func TestGroup_Panic_Error(t *testing.T) {
 	cause := fmt.Errorf("frack")
-	group, ctx := WithContext(context.Background())
+	group, ctx := NewContext(context.Background())
 	group.Go(func() error {
 		panic(cause)
 	})
