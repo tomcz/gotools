@@ -79,7 +79,7 @@ func (p *panicGroup) Go(f func() error) {
 func defaultPanicHandler(p any) error {
 	stack := string(debug.Stack())
 	if ex, ok := p.(error); ok {
-		return fmt.Errorf("panic: %w; stack: %s", ex, stack)
+		return fmt.Errorf("panic: %w\nstack: %s", ex, stack)
 	}
-	return fmt.Errorf("panic: %+v; stack: %s", p, stack)
+	return fmt.Errorf("panic: %+v\nstack: %s", p, stack)
 }
