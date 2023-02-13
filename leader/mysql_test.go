@@ -78,8 +78,7 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 		age:        10 * time.Second,
 	}
 
-	election := leader.election()
-	require.NoError(t, election(ctx))
+	require.NoError(t, leader.election(ctx))
 
 	isLeader, err := leader.IsLeader(ctx)
 	if assert.NoError(t, err) {
@@ -109,12 +108,9 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 		age:        10 * time.Second,
 	}
 
-	e1 := l1.election()
-	e2 := l2.election()
-
 	// l1 wins election
-	require.NoError(t, e1(ctx))
-	require.NoError(t, e2(ctx))
+	require.NoError(t, l1.election(ctx))
+	require.NoError(t, l2.election(ctx))
 
 	isLeader, err := l1.IsLeader(ctx)
 	if assert.NoError(t, err) {
@@ -127,8 +123,8 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 
 	// l2 wins next election
 	mock.Add(11 * time.Second)
-	require.NoError(t, e2(ctx))
-	require.NoError(t, e1(ctx))
+	require.NoError(t, l2.election(ctx))
+	require.NoError(t, l1.election(ctx))
 
 	isLeader, err = l1.IsLeader(ctx)
 	if assert.NoError(t, err) {
