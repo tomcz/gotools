@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/v3/assert"
 )
 
 type testLogger struct {
@@ -25,7 +25,7 @@ func (l *testLogger) Panic(p any) {
 func TestClose_Quiet(t *testing.T) {
 	closed := false
 	CloseFunc(func() { closed = true })
-	assert.True(t, closed, "close function was not called")
+	assert.Assert(t, closed, "close function was not called")
 }
 
 func TestClose_Error(t *testing.T) {
@@ -57,5 +57,5 @@ func TestClose_Timeout(t *testing.T) {
 		return nil
 	}
 	CloseWithTimeout(closer, time.Minute)
-	assert.True(t, closed, "close function was not called")
+	assert.Assert(t, closed, "close function was not called")
 }

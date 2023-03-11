@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/v3/assert"
 )
 
 func TestReduce(t *testing.T) {
@@ -18,13 +18,11 @@ func TestReduceErr(t *testing.T) {
 
 	reducer := func(val int, acc int) (int, error) { return val + acc, nil }
 	actual, err := ReduceErr(input, 0, reducer)
-	if assert.NoError(t, err) {
-		assert.Equal(t, 10, actual)
-	}
+	assert.NilError(t, err)
+	assert.Equal(t, 10, actual)
 
 	reducerErr := func(val int, acc int) (int, error) { return -1, errors.New("test error") }
 	actual, err = ReduceErr(input, 0, reducerErr)
-	if assert.EqualError(t, err, "test error") {
-		assert.Equal(t, -1, actual)
-	}
+	assert.Error(t, err, "test error")
+	assert.Equal(t, -1, actual)
 }

@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 	"github.com/tomcz/gotools/env"
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/v3/assert"
 )
 
 type testCfg struct {
@@ -28,7 +28,7 @@ func TestEnv(t *testing.T) {
 
 	err := env.PopulateFromEnv(cfg)
 
-	if assert.NoError(t, err) {
+	if assert.NilError(t, err) {
 		assert.Equal(t, "Homer", cfg.User)
 		assert.Equal(t, 42, cfg.Age)
 		assert.Equal(t, true, cfg.Admin)

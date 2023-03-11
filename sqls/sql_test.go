@@ -11,8 +11,7 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"gotest.tools/v3/assert"
 )
 
 const createLeaderTableSQL = `
@@ -51,11 +50,11 @@ func TestSqlTools(t *testing.T) {
 	cfg.Passwd = os.Getenv("DB_PASSWORD")
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
-	require.NoError(t, err)
+	assert.NilError(t, err)
 	defer db.Close()
 
 	_, err = db.Exec(createLeaderTableSQL)
-	require.NoError(t, err)
+	assert.NilError(t, err)
 
 	tests := []struct {
 		name   string
@@ -101,29 +100,27 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 	}
 	err := InTx(db, func(tx *sql.Tx) error {
 		for _, x := range leaders {
-			_, err := tx.Exec(insertLeaderSQL, x.leader, x.node, time.Now())
-			if err != nil {
-				return err
+			_, rerr := tx.Exec(insertLeaderSQL, x.leader, x.node, time.Now())
+			if rerr != nil {
+				return rerr
 			}
 		}
 		return nil
 	})
-	if assert.NoError(t, err) {
-		results := make(map[string]string)
-		err = QueryRows(db, selectLeadersSQL)(func(row ScanFunc) error {
-			var leader, node string
-			if err := row(&leader, &node); err != nil {
-				return nil
-			}
-			results[leader] = node
-			return nil
-		})
-		if assert.NoError(t, err) {
-			assert.NotEmpty(t, results)
-			for _, x := range leaders {
-				assert.Equal(t, x.node, results[x.leader])
-			}
+	assert.NilError(t, err)
+	results := make(map[string]string)
+	err = QueryRows(db, selectLeadersSQL)(func(row ScanFunc) error {
+		var leader, node string
+		if rerr := row(&leader, &node); rerr != nil {
+			return rerr
 		}
+		results[leader] = node
+		return nil
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, len(results) > 0)
+	for _, x := range leaders {
+		assert.Equal(t, x.node, results[x.leader])
 	}
 }
 
@@ -144,20 +141,18 @@ func testInTxRollback(t *testing.T, db *sql.DB) {
 	}
 	err := InTx(db, func(tx *sql.Tx) error {
 		for _, x := range leaders {
-			_, err := tx.Exec(insertLeaderSQL, x.leader, x.node, time.Now())
-			if err != nil {
-				return err
+			_, rerr := tx.Exec(insertLeaderSQL, x.leader, x.node, time.Now())
+			if rerr != nil {
+				return rerr
 			}
 		}
 		return nil
 	})
-	if assert.Error(t, err) {
-		var count int
-		err = db.QueryRow(countLeadersSQL, leaderName).Scan(&count)
-		if assert.NoError(t, err) {
-			assert.Equal(t, 0, count)
-		}
-	}
+	assert.Assert(t, err != nil)
+	var count int
+	err = db.QueryRow(countLeadersSQL, leaderName).Scan(&count)
+	assert.NilError(t, err)
+	assert.Equal(t, 0, count)
 }
 
 func testInTxContextCommit(t *testing.T, db *sql.DB) {
@@ -177,29 +172,27 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 	}
 	err := InTxContext(ctx, db, func(tx *sql.Tx) error {
 		for _, x := range leaders {
-			_, err := tx.ExecContext(ctx, insertLeaderSQL, x.leader, x.node, time.Now())
-			if err != nil {
-				return err
+			_, rerr := tx.ExecContext(ctx, insertLeaderSQL, x.leader, x.node, time.Now())
+			if rerr != nil {
+				return rerr
 			}
 		}
 		return nil
 	})
-	if assert.NoError(t, err) {
-		results := make(map[string]string)
-		err = QueryRowsContext(ctx, db, selectLeadersSQL)(func(row ScanFunc) error {
-			var leader, node string
-			if err := row(&leader, &node); err != nil {
-				return nil
-			}
-			results[leader] = node
-			return nil
-		})
-		if assert.NoError(t, err) {
-			assert.NotEmpty(t, results)
-			for _, x := range leaders {
-				assert.Equal(t, x.node, results[x.leader])
-			}
+	assert.NilError(t, err)
+	results := make(map[string]string)
+	err = QueryRowsContext(ctx, db, selectLeadersSQL)(func(row ScanFunc) error {
+		var leader, node string
+		if rerr := row(&leader, &node); rerr != nil {
+			return rerr
 		}
+		results[leader] = node
+		return nil
+	})
+	assert.NilError(t, err)
+	assert.Assert(t, len(results) > 0)
+	for _, x := range leaders {
+		assert.Equal(t, x.node, results[x.leader])
 	}
 }
 
@@ -221,18 +214,16 @@ func testInTxContextRollback(t *testing.T, db *sql.DB) {
 	}
 	err := InTxContext(ctx, db, func(tx *sql.Tx) error {
 		for _, x := range leaders {
-			_, err := tx.ExecContext(ctx, insertLeaderSQL, x.leader, x.node, time.Now())
-			if err != nil {
-				return err
+			_, rerr := tx.ExecContext(ctx, insertLeaderSQL, x.leader, x.node, time.Now())
+			if rerr != nil {
+				return rerr
 			}
 		}
 		return nil
 	})
-	if assert.Error(t, err) {
-		var count int
-		err = db.QueryRowContext(ctx, countLeadersSQL, leaderName).Scan(&count)
-		if assert.NoError(t, err) {
-			assert.Equal(t, 0, count)
-		}
-	}
+	assert.Assert(t, err != nil)
+	var count int
+	err = db.QueryRowContext(ctx, countLeadersSQL, leaderName).Scan(&count)
+	assert.NilError(t, err)
+	assert.Equal(t, 0, count)
 }
