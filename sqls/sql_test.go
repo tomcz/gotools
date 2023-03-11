@@ -148,7 +148,7 @@ func testInTxRollback(t *testing.T, db *sql.DB) {
 		}
 		return nil
 	})
-	assert.Assert(t, err != nil)
+	assert.ErrorContains(t, err, "Duplicate entry")
 	var count int
 	err = db.QueryRow(countLeadersSQL, leaderName).Scan(&count)
 	assert.NilError(t, err)
@@ -221,7 +221,7 @@ func testInTxContextRollback(t *testing.T, db *sql.DB) {
 		}
 		return nil
 	})
-	assert.Assert(t, err != nil)
+	assert.ErrorContains(t, err, "Duplicate entry")
 	var count int
 	err = db.QueryRowContext(ctx, countLeadersSQL, leaderName).Scan(&count)
 	assert.NilError(t, err)
