@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -41,15 +42,50 @@ FROM test_leaders
 WHERE leader_name = ?
 `
 
-func TestSqlTools(t *testing.T) {
+func openConn(dbName string) (*sql.DB, error) {
 	cfg := mysql.NewConfig()
 	cfg.Net = "tcp"
 	cfg.Addr = os.Getenv("DB_HOST")
-	cfg.DBName = os.Getenv("DB_DATABASE")
 	cfg.User = os.Getenv("DB_USER")
 	cfg.Passwd = os.Getenv("DB_PASSWORD")
+	cfg.DBName = dbName
+	return sql.Open("mysql", cfg.FormatDSN())
+}
 
-	db, err := sql.Open("mysql", cfg.FormatDSN())
+func createTestDatabase() (string, error) {
+	dbName := strings.ReplaceAll("test"+uuid.NewString(), "-", "")
+	db, err := openConn("")
+	if err != nil {
+		return "", err
+	}
+	_, err = db.Exec("CREATE DATABASE " + dbName)
+	if err != nil {
+		return "", err
+	}
+	return dbName, db.Close()
+}
+
+func dropTestDatabase(dbName string) error {
+	db, err := openConn("")
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DROP DATABASE " + dbName)
+	if err != nil {
+		return err
+	}
+	return db.Close()
+}
+
+func TestSqlTools(t *testing.T) {
+	dbName, err := createTestDatabase()
+	assert.NilError(t, err, "createTestDatabase failed")
+	defer func() {
+		dropErr := dropTestDatabase(dbName)
+		assert.Check(t, dropErr, "dropTestDatabase failed")
+	}()
+
+	db, err := openConn(dbName)
 	assert.NilError(t, err)
 	defer db.Close()
 
