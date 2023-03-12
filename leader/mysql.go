@@ -79,7 +79,7 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 		opt(leader)
 	}
 	if leader.nodeName == "" {
-		leader.nodeName = uuid.New().String()
+		leader.nodeName = uuid.NewString()
 	}
 	if leader.clock == nil {
 		leader.clock = clock.New()

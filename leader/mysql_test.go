@@ -55,7 +55,7 @@ func TestMysqlLeader(t *testing.T) {
 
 func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
-	leaderName := uuid.New().String()
+	leaderName := uuid.NewString()
 	leader := NewMysqlLeader(db, leaderName)
 	isLeader, err := leader.IsLeader(ctx)
 	assert.NilError(t, err)
@@ -70,8 +70,8 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 
 	leader := &mysqlLeader{
 		db:         db,
-		leaderName: uuid.New().String(),
-		nodeName:   uuid.New().String(),
+		leaderName: uuid.NewString(),
+		nodeName:   uuid.NewString(),
 		clock:      mock,
 		age:        10 * time.Second,
 	}
@@ -85,7 +85,7 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 
 func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
-	leaderName := uuid.New().String()
+	leaderName := uuid.NewString()
 
 	mock := clock.NewMock()
 	mock.Set(time.Now())
@@ -93,14 +93,14 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	l1 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
-		nodeName:   uuid.New().String(),
+		nodeName:   uuid.NewString(),
 		clock:      mock,
 		age:        10 * time.Second,
 	}
 	l2 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
-		nodeName:   uuid.New().String(),
+		nodeName:   uuid.NewString(),
 		clock:      mock,
 		age:        10 * time.Second,
 	}

@@ -90,12 +90,12 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 		node   string
 	}{
 		{
-			leader: uuid.New().String(),
-			node:   uuid.New().String(),
+			leader: uuid.NewString(),
+			node:   uuid.NewString(),
 		},
 		{
-			leader: uuid.New().String(),
-			node:   uuid.New().String(),
+			leader: uuid.NewString(),
+			node:   uuid.NewString(),
 		},
 	}
 	err := InTx(db, func(tx *sql.Tx) error {
@@ -125,18 +125,18 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 }
 
 func testInTxRollback(t *testing.T, db *sql.DB) {
-	leaderName := uuid.New().String()
+	leaderName := uuid.NewString()
 	leaders := []struct {
 		leader string
 		node   string
 	}{
 		{
 			leader: leaderName,
-			node:   uuid.New().String(),
+			node:   uuid.NewString(),
 		},
 		{
 			leader: leaderName,
-			node:   uuid.New().String(),
+			node:   uuid.NewString(),
 		},
 	}
 	err := InTx(db, func(tx *sql.Tx) error {
@@ -162,12 +162,12 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 		node   string
 	}{
 		{
-			leader: uuid.New().String(),
-			node:   uuid.New().String(),
+			leader: uuid.NewString(),
+			node:   uuid.NewString(),
 		},
 		{
-			leader: uuid.New().String(),
-			node:   uuid.New().String(),
+			leader: uuid.NewString(),
+			node:   uuid.NewString(),
 		},
 	}
 	err := InTxContext(ctx, db, func(tx *sql.Tx) error {
@@ -198,18 +198,18 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 
 func testInTxContextRollback(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
-	leaderName := uuid.New().String()
+	leaderName := uuid.NewString()
 	leaders := []struct {
 		leader string
 		node   string
 	}{
 		{
 			leader: leaderName,
-			node:   uuid.New().String(),
+			node:   uuid.NewString(),
 		},
 		{
 			leader: leaderName,
-			node:   uuid.New().String(),
+			node:   uuid.NewString(),
 		},
 	}
 	err := InTxContext(ctx, db, func(tx *sql.Tx) error {
