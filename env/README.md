@@ -28,11 +28,10 @@ func TestEnv(t *testing.T) {
 
 	err := env.PopulateFromEnv(cfg)
 
-	if assert.NilError(t, err) {
-		assert.Equal(t, "Homer", cfg.User)
-		assert.Equal(t, 42, cfg.Age)
-		assert.Equal(t, true, cfg.Admin)
-		assert.Equal(t, 8080, cfg.Port)
-	}
+	assert.NilError(t, err)
+	assert.Equal(t, "Homer", cfg.User)
+	assert.Equal(t, 42, cfg.Age)
+	assert.Equal(t, true, cfg.Admin)
+	assert.Equal(t, 8080, cfg.Port)
 }
 ```
