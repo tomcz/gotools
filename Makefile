@@ -39,7 +39,7 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t mysql:5.7                    \
+		-t mysql:8.0                    \
 		./scripts/wait-for-mysql.sh
 	@docker run --rm                    \
 		-e DB_HOST="database"           \
