@@ -1,6 +1,6 @@
 package slices
 
-// Select returns a slice with values where the selector returned true.
+// Select returns a slice with all values where the selector returned true.
 func Select[V any](src []V, selector func(V) bool) []V {
 	var dest []V
 	for _, val := range src {

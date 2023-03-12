@@ -1,4 +1,5 @@
 /*
-Package slices provides generic operations on slices because writing for loops over and over is really boring.
+Package slices provides generic operations on slices
+because we've got better things to do than write for-loops over and over.
 */
 package slices
