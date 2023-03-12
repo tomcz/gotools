@@ -16,7 +16,7 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func openConn(dbName string) (*sql.DB, error) {
+func sqlOpen(dbName string) (*sql.DB, error) {
 	cfg := mysql.NewConfig()
 	cfg.Net = "tcp"
 	cfg.Addr = os.Getenv("DB_HOST")
@@ -28,7 +28,7 @@ func openConn(dbName string) (*sql.DB, error) {
 
 func createTestDatabase() (string, error) {
 	dbName := strings.ReplaceAll("test"+uuid.NewString(), "-", "")
-	db, err := openConn("")
+	db, err := sqlOpen("")
 	if err != nil {
 		return "", err
 	}
@@ -40,7 +40,7 @@ func createTestDatabase() (string, error) {
 }
 
 func dropTestDatabase(dbName string) error {
-	db, err := openConn("")
+	db, err := sqlOpen("")
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func TestMysqlLeader(t *testing.T) {
 		assert.Check(t, dropErr, "dropTestDatabase failed")
 	}()
 
-	db, err := openConn(dbName)
+	db, err := sqlOpen(dbName)
 	assert.NilError(t, err)
 	defer db.Close()
 
