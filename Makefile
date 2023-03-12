@@ -43,7 +43,6 @@ docker-run:
 		./scripts/wait-for-mysql.sh
 	@docker run --rm                    \
 		-e DB_HOST="database"           \
-		-e DB_DATABASE="gotools_test"   \
 		-e DB_USER="root"               \
 		-e DB_PASSWORD="sekret"         \
 		--network gotools_local         \
