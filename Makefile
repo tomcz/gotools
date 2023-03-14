@@ -21,7 +21,7 @@ endif
 
 .PHONY: tidy
 tidy:
-	go mod tidy -compat=1.19
+	go mod tidy -compat=1.20
 
 COMPOSE_CMD := docker compose -p gotools -f scripts/docker-compose.yml
 
@@ -48,5 +48,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.19                  \
+		-t golang:1.20                  \
 		make test
