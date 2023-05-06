@@ -3,6 +3,7 @@ package leader
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/benbjohnson/clock"
@@ -58,6 +59,18 @@ func WithOnError(onError func(error) error) MysqlOpt {
 	}
 }
 
+// AbortOnError is the default WithOnError strategy.
+func AbortOnError(err error) error {
+	return err
+}
+
+// ContinueOnError is an example WithOnError strategy that logs
+// the error and allows the leadership election to proceed.
+func ContinueOnError(err error) error {
+	log.Printf("[WARNING] leadership error: %s\n", err)
+	return nil
+}
+
 type mysqlLeader struct {
 	db         *sql.DB
 	leaderName string
@@ -91,7 +104,7 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 		leader.age = 60 * time.Second
 	}
 	if leader.onError == nil {
-		leader.onError = abortOnError
+		leader.onError = AbortOnError
 	}
 	return leader
 }
@@ -103,9 +116,7 @@ func (m *mysqlLeader) Acquire(ctx context.Context) error {
 		select {
 		case <-ticker.C:
 			if err := m.election(ctx); err != nil {
-				if err = m.onError(err); err != nil {
-					return err
-				}
+				return err
 			}
 		case <-ctx.Done():
 			return ctx.Err()
@@ -138,10 +149,9 @@ last_update = IF(node_name = VALUES(node_name), VALUES(last_update), last_update
 
 func (m *mysqlLeader) election(ctx context.Context) error {
 	_, err := m.db.ExecContext(ctx, electionSQL, m.leaderName, m.nodeName, m.clock.Now(), int64(m.age.Seconds()))
-	return err
-}
-
-func abortOnError(err error) error {
+	if err != nil {
+		err = m.onError(err)
+	}
 	return err
 }
 
