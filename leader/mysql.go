@@ -67,7 +67,7 @@ func AbortOnError(err error) error {
 // ContinueOnError is an example WithOnError strategy that logs
 // the error and allows the leadership election to proceed.
 func ContinueOnError(err error) error {
-	log.Printf("[WARNING] leadership error: %s\n", err)
+	log.Printf("[WARNING] leadership error: %v\n", err)
 	return nil
 }
 
