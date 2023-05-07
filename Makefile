@@ -27,8 +27,8 @@ COMPOSE_CMD := docker compose -p gotools -f scripts/docker-compose.yml
 
 .PHONY: docker
 docker:
-	@${COMPOSE_CMD} up -d
-	@bash -c "trap '${COMPOSE_CMD} down' EXIT; $(MAKE) docker-run"
+	${COMPOSE_CMD} up -d
+	bash -c "trap '${COMPOSE_CMD} down' EXIT; $(MAKE) docker-run"
 
 .PHONY: docker-run
 docker-run:
@@ -50,3 +50,8 @@ docker-run:
 		-w /code                        \
 		-t golang:1.20                  \
 		make test
+
+.PHONY: docker-up
+docker-up:
+	-${COMPOSE_CMD} up
+	${COMPOSE_CMD} down
