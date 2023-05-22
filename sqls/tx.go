@@ -3,7 +3,7 @@ package sqls
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"errors"
 )
 
 // InTx starts a database transaction, executes the callback function,
@@ -17,7 +17,7 @@ func InTx(db *sql.DB, callback func(tx *sql.Tx) error) error {
 	err = callback(tx)
 	if err != nil {
 		if ex := tx.Rollback(); ex != nil {
-			return fmt.Errorf("rollback for '%w' failed with: %v", err, ex)
+			return errors.Join(err, ex)
 		}
 		return err
 	}
@@ -45,7 +45,7 @@ func InTxContext(ctx context.Context, db *sql.DB, callback func(tx *sql.Tx) erro
 	err = callback(tx)
 	if err != nil {
 		if ex := tx.Rollback(); ex != nil {
-			return fmt.Errorf("rollback for '%w' failed with: %v", err, ex)
+			return errors.Join(err, ex)
 		}
 		return err
 	}
