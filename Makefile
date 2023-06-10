@@ -53,5 +53,4 @@ docker-run:
 
 .PHONY: docker-up
 docker-up:
-	-${COMPOSE_CMD} up
-	${COMPOSE_CMD} down
+	${COMPOSE_CMD} up
