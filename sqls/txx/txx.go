@@ -12,7 +12,7 @@ import (
 // callback function, and either commits the transaction if the callback
 // exits without an error, or rolls-back the transaction if the callback
 // returns an error.
-func InTxx(ctx context.Context, db sqlx.Conn, callback func(tx *sqlx.Tx) error, opts ...*sql.TxOptions) error {
+func InTxx(ctx context.Context, db *sqlx.DB, callback func(tx *sqlx.Tx) error, opts ...*sql.TxOptions) error {
 	var txOpts *sql.TxOptions
 	for _, opt := range opts {
 		if txOpts == nil {
