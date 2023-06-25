@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/benbjohnson/clock"
 	"github.com/google/uuid"
+	"k8s.io/utils/clock"
 )
 
 // MysqlOpt allows configuration of leader defaults.
@@ -38,7 +38,7 @@ func WithAge(age time.Duration) MysqlOpt {
 }
 
 // WithClock replaces the default system clock.
-func WithClock(ck clock.Clock) MysqlOpt {
+func WithClock(ck clock.WithTicker) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.clock = ck
 	}
@@ -75,7 +75,7 @@ type mysqlLeader struct {
 	db         *sql.DB
 	leaderName string
 	nodeName   string
-	clock      clock.Clock
+	clock      clock.WithTicker
 	tick       time.Duration
 	age        time.Duration
 	onError    func(error) error
@@ -95,7 +95,7 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 		leader.nodeName = uuid.NewString()
 	}
 	if leader.clock == nil {
-		leader.clock = clock.New()
+		leader.clock = clock.RealClock{}
 	}
 	if leader.tick < time.Second {
 		leader.tick = 15 * time.Second
@@ -110,11 +110,11 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 }
 
 func (m *mysqlLeader) Acquire(ctx context.Context) error {
-	ticker := m.clock.Ticker(m.tick)
+	ticker := m.clock.NewTicker(m.tick)
 	defer ticker.Stop()
 	for {
 		select {
-		case <-ticker.C:
+		case <-ticker.C():
 			if err := m.election(ctx); err != nil {
 				return err
 			}

@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/benbjohnson/clock"
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"gotest.tools/v3/assert"
+	clock "k8s.io/utils/clock/testing"
 )
 
 func sqlOpen(dbName string) (*sql.DB, error) {
@@ -101,14 +101,13 @@ func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 func testElectedIsLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
 
-	mock := clock.NewMock()
-	mock.Set(time.Now())
+	fake := clock.NewFakeClock(time.Now())
 
 	leader := &mysqlLeader{
 		db:         db,
 		leaderName: uuid.NewString(),
 		nodeName:   uuid.NewString(),
-		clock:      mock,
+		clock:      fake,
 		age:        10 * time.Second,
 	}
 
@@ -123,21 +122,20 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
 	leaderName := uuid.NewString()
 
-	mock := clock.NewMock()
-	mock.Set(time.Now())
+	fake := clock.NewFakeClock(time.Now())
 
 	l1 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
 		nodeName:   uuid.NewString(),
-		clock:      mock,
+		clock:      fake,
 		age:        10 * time.Second,
 	}
 	l2 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
 		nodeName:   uuid.NewString(),
-		clock:      mock,
+		clock:      fake,
 		age:        10 * time.Second,
 	}
 
@@ -154,7 +152,7 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	assert.Assert(t, !isLeader, "l2 should not be leader")
 
 	// l2 wins next election
-	mock.Add(11 * time.Second)
+	fake.Step(11 * time.Second)
 	assert.NilError(t, l2.election(ctx))
 	assert.NilError(t, l1.election(ctx))
 
