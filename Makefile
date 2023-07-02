@@ -5,6 +5,9 @@ precommit: format lint test
 
 .PHONY: format
 format:
+ifeq ($(shell which goimports),)
+	go install golang.org/x/tools/cmd/goimports@latest
+endif
 	goimports -w -local github.com/tomcz/gotools .
 
 .PHONY: lint

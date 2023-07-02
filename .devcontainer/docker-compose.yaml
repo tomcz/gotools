@@ -6,6 +6,10 @@ services:
       - ../..:/workspaces:cached
     network_mode: service:db
     command: sleep infinity
+    environment:
+      DB_HOST: localhost
+      DB_USER: root
+      DB_PASSWORD: sekret
 
   db:
     image: mysql:8.0
