@@ -12,6 +12,9 @@ endif
 
 .PHONY: lint
 lint:
+ifeq ($(shell which golangci-lint),)
+	$(error "Please install golangci-lint from https://github.com/golangci/golangci-lint")
+endif
 	golangci-lint run
 
 .PHONY: test
