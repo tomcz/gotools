@@ -1,9 +1,9 @@
 package maths
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
 // Min returns the least value.
-func Min[X constraints.Ordered](a, b X) X {
+func Min[X cmp.Ordered](a, b X) X {
 	if a < b {
 		return a
 	}
@@ -11,7 +11,7 @@ func Min[X constraints.Ordered](a, b X) X {
 }
 
 // MinOf returns the least value.
-func MinOf[X constraints.Ordered](a X, bb ...X) X {
+func MinOf[X cmp.Ordered](a X, bb ...X) X {
 	for _, b := range bb {
 		a = Min(a, b)
 	}

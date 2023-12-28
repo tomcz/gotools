@@ -1,9 +1,8 @@
 package maps
 
 import (
+	"cmp"
 	"sort"
-
-	"golang.org/x/exp/constraints"
 )
 
 // Keys returns a randomly-sorted slice of map keys.
@@ -16,7 +15,7 @@ func Keys[K comparable, V any](src map[K]V) []K {
 }
 
 // SortedKeys returns a sorted slice of map keys.
-func SortedKeys[K constraints.Ordered, V any](src map[K]V) []K {
+func SortedKeys[K cmp.Ordered, V any](src map[K]V) []K {
 	keys := Keys(src)
 	sort.Slice(keys, func(i, j int) bool {
 		return keys[i] < keys[j]
@@ -34,7 +33,7 @@ func Values[K comparable, V any](src map[K]V) []V {
 }
 
 // SortedValues returns a sorted slice of map values.
-func SortedValues[K comparable, V constraints.Ordered](src map[K]V) []V {
+func SortedValues[K comparable, V cmp.Ordered](src map[K]V) []V {
 	values := Values(src)
 	sort.Slice(values, func(i, j int) bool {
 		return values[i] < values[j]
@@ -58,7 +57,7 @@ func Entries[K comparable, V any](src map[K]V) []Entry[K, V] {
 }
 
 // SortedEntries returns a slice of map entries sorted by their keys.
-func SortedEntries[K constraints.Ordered, V any](src map[K]V) []Entry[K, V] {
+func SortedEntries[K cmp.Ordered, V any](src map[K]V) []Entry[K, V] {
 	entries := Entries(src)
 	sort.Slice(entries, func(i, j int) bool {
 		return entries[i].Key < entries[j].Key

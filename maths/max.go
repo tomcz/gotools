@@ -1,9 +1,9 @@
 package maths
 
-import "golang.org/x/exp/constraints"
+import "cmp"
 
 // Max returns the greatest value.
-func Max[X constraints.Ordered](a, b X) X {
+func Max[X cmp.Ordered](a, b X) X {
 	if a > b {
 		return a
 	}
@@ -11,7 +11,7 @@ func Max[X constraints.Ordered](a, b X) X {
 }
 
 // MaxOf returns the greatest value.
-func MaxOf[X constraints.Ordered](a X, bb ...X) X {
+func MaxOf[X cmp.Ordered](a X, bb ...X) X {
 	for _, b := range bb {
 		a = Max(a, b)
 	}
