@@ -35,7 +35,7 @@ func TestCloserOrder(t *testing.T) {
 	closer.Add(c1w, c2w)
 	closer.AddFunc(c3)
 	closer.AddFuncE(c4)
-	closer.AddTimeout(c5, time.Minute)
+	closer.AddShutdown(c5, time.Minute)
 
 	assert.NilError(t, closer.Close())
 	assert.DeepEqual(t, []string{"5", "4", "3", "2", "1"}, called)

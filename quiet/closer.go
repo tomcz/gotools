@@ -29,9 +29,9 @@ func (c *Closer) AddFuncE(close func() error) {
 	c.closers = append(c.closers, &quietCloserE{close})
 }
 
-// AddTimeout adds a shutdown function to be invoked by CloseAll.
-func (c *Closer) AddTimeout(close func(ctx context.Context) error, timeout time.Duration) {
-	c.closers = append(c.closers, &timeoutCloser{close: close, timeout: timeout})
+// AddShutdown adds a shutdown function to be invoked by CloseAll.
+func (c *Closer) AddShutdown(shutdown func(ctx context.Context) error, timeout time.Duration) {
+	c.closers = append(c.closers, &timeoutCloser{close: shutdown, timeout: timeout})
 }
 
 // CloseAll will call each closer in reverse order to addition.
