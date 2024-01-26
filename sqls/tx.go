@@ -31,12 +31,7 @@ func InTx(db *sql.DB, callback func(tx *sql.Tx) error) error {
 func InTxContext(ctx context.Context, db *sql.DB, callback func(tx *sql.Tx) error, opts ...*sql.TxOptions) error {
 	var txOpts *sql.TxOptions
 	for _, opt := range opts {
-		if txOpts == nil {
-			txOpts = opt
-		} else {
-			txOpts.ReadOnly = opt.ReadOnly
-			txOpts.Isolation = opt.Isolation
-		}
+		txOpts = opt
 	}
 	tx, err := db.BeginTx(ctx, txOpts)
 	if err != nil {

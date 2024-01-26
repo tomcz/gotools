@@ -15,12 +15,7 @@ import (
 func InTxx(ctx context.Context, db *sqlx.DB, callback func(tx *sqlx.Tx) error, opts ...*sql.TxOptions) error {
 	var txOpts *sql.TxOptions
 	for _, opt := range opts {
-		if txOpts == nil {
-			txOpts = opt
-		} else {
-			txOpts.ReadOnly = opt.ReadOnly
-			txOpts.Isolation = opt.Isolation
-		}
+		txOpts = opt
 	}
 	tx, err := db.BeginTxx(ctx, txOpts)
 	if err != nil {
