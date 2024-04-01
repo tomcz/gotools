@@ -144,11 +144,11 @@ const electionSQL = `
 INSERT INTO leader_election (leader_name, node_name, last_update) VALUES (?, ?, ?)
 ON DUPLICATE KEY UPDATE
 node_name = IF(last_update < DATE_SUB(VALUES(last_update), INTERVAL ? SECOND), VALUES(node_name), node_name),
-last_update = IF(node_name = VALUES(node_name), VALUES(last_update), last_update)
+last_update = IF(node_name = VALUES(node_name) OR last_update < DATE_SUB(VALUES(last_update), INTERVAL ? SECOND), VALUES(last_update), last_update)
 `
 
 func (m *mysqlLeader) election(ctx context.Context) error {
-	_, err := m.db.ExecContext(ctx, electionSQL, m.leaderName, m.nodeName, m.clock.Now(), int64(m.age.Seconds()))
+	_, err := m.db.ExecContext(ctx, electionSQL, m.leaderName, m.nodeName, m.clock.Now(), int64(m.age.Seconds()), int64(m.age.Seconds()))
 	if err != nil {
 		err = m.onError(err)
 	}
