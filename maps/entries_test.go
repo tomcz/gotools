@@ -3,7 +3,7 @@ package maps
 import (
 	"testing"
 
-	"gotest.tools/v3/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestSortedEntries(t *testing.T) {
@@ -14,8 +14,8 @@ func TestSortedEntries(t *testing.T) {
 		"4": 4,
 		"5": 5,
 	}
-	assert.DeepEqual(t, []string{"1", "2", "3", "4", "5"}, SortedKeys(data))
-	assert.DeepEqual(t, []int{1, 2, 3, 4, 5}, SortedValues(data))
+	assert.Equal(t, []string{"1", "2", "3", "4", "5"}, SortedKeys(data))
+	assert.Equal(t, []int{1, 2, 3, 4, 5}, SortedValues(data))
 
 	expected := []Entry[string, int]{
 		{Key: "1", Val: 1},
@@ -24,6 +24,6 @@ func TestSortedEntries(t *testing.T) {
 		{Key: "4", Val: 4},
 		{Key: "5", Val: 5},
 	}
-	assert.DeepEqual(t, expected, SortedEntries(data))
-	assert.DeepEqual(t, data, FromEntries(expected))
+	assert.Equal(t, expected, SortedEntries(data))
+	assert.Equal(t, data, FromEntries(expected))
 }

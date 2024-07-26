@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"gotest.tools/v3/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestCloserOrder(t *testing.T) {
@@ -37,6 +37,6 @@ func TestCloserOrder(t *testing.T) {
 	closer.AddFuncE(c4)
 	closer.AddShutdown(c5, time.Minute)
 
-	assert.NilError(t, closer.Close())
-	assert.DeepEqual(t, []string{"5", "4", "3", "2", "1"}, called)
+	assert.NoError(t, closer.Close())
+	assert.Equal(t, []string{"5", "4", "3", "2", "1"}, called)
 }

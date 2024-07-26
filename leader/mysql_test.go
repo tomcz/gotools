@@ -12,7 +12,8 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
-	"gotest.tools/v3/assert"
+	check "github.com/stretchr/testify/assert"
+	assert "github.com/stretchr/testify/require"
 	clock "k8s.io/utils/clock/testing"
 )
 
@@ -53,17 +54,17 @@ func dropTestDatabase(dbName string) error {
 
 func TestMysqlLeader(t *testing.T) {
 	dbName, err := createTestDatabase()
-	assert.NilError(t, err, "createTestDatabase failed")
+	assert.NoError(t, err, "createTestDatabase failed")
 	defer func() {
 		dropErr := dropTestDatabase(dbName)
-		assert.Check(t, dropErr, "dropTestDatabase failed")
+		check.NoError(t, dropErr, "dropTestDatabase failed")
 	}()
 
 	db, err := sqlOpen(dbName)
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	defer db.Close()
 
-	assert.NilError(t, CreateMysqlLeaderTable(db))
+	assert.NoError(t, CreateMysqlLeaderTable(db))
 
 	tests := []struct {
 		name   string
@@ -94,8 +95,8 @@ func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 	leaderName := uuid.NewString()
 	leader := NewMysqlLeader(db, leaderName)
 	isLeader, err := leader.IsLeader(ctx)
-	assert.NilError(t, err)
-	assert.Assert(t, !isLeader)
+	assert.NoError(t, err)
+	assert.False(t, isLeader)
 }
 
 func testElectedIsLeader(t *testing.T, db *sql.DB) {
@@ -111,11 +112,11 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 		age:        10 * time.Second,
 	}
 
-	assert.NilError(t, leader.election(ctx))
+	assert.NoError(t, leader.election(ctx))
 
 	isLeader, err := leader.IsLeader(ctx)
-	assert.NilError(t, err)
-	assert.Assert(t, isLeader)
+	assert.NoError(t, err)
+	assert.True(t, isLeader)
 }
 
 func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
@@ -140,27 +141,27 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	}
 
 	// l1 wins election
-	assert.NilError(t, l1.election(ctx))
-	assert.NilError(t, l2.election(ctx))
+	assert.NoError(t, l1.election(ctx))
+	assert.NoError(t, l2.election(ctx))
 
 	isLeader, err := l1.IsLeader(ctx)
-	assert.NilError(t, err)
-	assert.Assert(t, isLeader, "l1 should be leader")
+	assert.NoError(t, err)
+	assert.True(t, isLeader, "l1 should be leader")
 
 	isLeader, err = l2.IsLeader(ctx)
-	assert.NilError(t, err)
-	assert.Assert(t, !isLeader, "l2 should not be leader")
+	assert.NoError(t, err)
+	assert.False(t, isLeader, "l2 should not be leader")
 
 	// l2 wins next election
 	fake.Step(11 * time.Second)
-	assert.NilError(t, l2.election(ctx))
-	assert.NilError(t, l1.election(ctx))
+	assert.NoError(t, l2.election(ctx))
+	assert.NoError(t, l1.election(ctx))
 
 	isLeader, err = l1.IsLeader(ctx)
-	assert.NilError(t, err)
-	assert.Assert(t, !isLeader, "l1 should not be leader")
+	assert.NoError(t, err)
+	assert.False(t, isLeader, "l1 should not be leader")
 
 	isLeader, err = l2.IsLeader(ctx)
-	assert.NilError(t, err)
-	assert.Assert(t, isLeader, "l2 should be leader")
+	assert.NoError(t, err)
+	assert.True(t, isLeader, "l2 should be leader")
 }

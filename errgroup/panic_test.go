@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"gotest.tools/v3/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestGroup_OK(t *testing.T) {
@@ -13,7 +13,7 @@ func TestGroup_OK(t *testing.T) {
 	group.Go(func() error {
 		return nil
 	})
-	assert.NilError(t, group.Wait())
+	assert.NoError(t, group.Wait())
 }
 
 func TestGroup_Error(t *testing.T) {

@@ -58,5 +58,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.21                  \
+		-t golang:1.22                  \
 		make test

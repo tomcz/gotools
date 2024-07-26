@@ -12,7 +12,8 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
-	"gotest.tools/v3/assert"
+	check "github.com/stretchr/testify/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 const createLeaderTableSQL = `
@@ -79,18 +80,18 @@ func dropTestDatabase(dbName string) error {
 
 func TestSqlTools(t *testing.T) {
 	dbName, err := createTestDatabase()
-	assert.NilError(t, err, "createTestDatabase failed")
+	assert.NoError(t, err, "createTestDatabase failed")
 	defer func() {
 		dropErr := dropTestDatabase(dbName)
-		assert.Check(t, dropErr, "dropTestDatabase failed")
+		check.NoError(t, dropErr, "dropTestDatabase failed")
 	}()
 
 	db, err := sqlOpen(dbName)
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	defer db.Close()
 
 	_, err = db.Exec(createLeaderTableSQL)
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 
 	tests := []struct {
 		name   string
@@ -143,7 +144,7 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 		}
 		return nil
 	})
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	results := make(map[string]string)
 	err = QueryRows(db, selectLeadersSQL)(func(row ScanFunc) error {
 		var leader, node string
@@ -153,8 +154,8 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 		results[leader] = node
 		return nil
 	})
-	assert.NilError(t, err)
-	assert.Assert(t, len(results) > 0)
+	assert.NoError(t, err)
+	assert.Greater(t, len(results), 0)
 	for _, x := range leaders {
 		assert.Equal(t, x.node, results[x.leader])
 	}
@@ -187,7 +188,7 @@ func testInTxRollback(t *testing.T, db *sql.DB) {
 	assert.ErrorContains(t, err, "Duplicate entry")
 	var count int
 	err = db.QueryRow(countLeadersSQL, leaderName).Scan(&count)
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, count)
 }
 
@@ -215,7 +216,7 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 		}
 		return nil
 	})
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	results := make(map[string]string)
 	err = QueryRowsContext(ctx, db, selectLeadersSQL)(func(row ScanFunc) error {
 		var leader, node string
@@ -225,8 +226,8 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 		results[leader] = node
 		return nil
 	})
-	assert.NilError(t, err)
-	assert.Assert(t, len(results) > 0)
+	assert.NoError(t, err)
+	assert.Greater(t, len(results), 0)
 	for _, x := range leaders {
 		assert.Equal(t, x.node, results[x.leader])
 	}
@@ -260,6 +261,6 @@ func testInTxContextRollback(t *testing.T, db *sql.DB) {
 	assert.ErrorContains(t, err, "Duplicate entry")
 	var count int
 	err = db.QueryRowContext(ctx, countLeadersSQL, leaderName).Scan(&count)
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, count)
 }

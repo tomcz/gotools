@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"gotest.tools/v3/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 type testCfg struct {
@@ -20,7 +20,7 @@ func TestPopulateFromEnv(t *testing.T) {
 	os.Setenv("test_is_admin", "true")
 	cfg := &testCfg{Port: 8080}
 	err := PopulateFromEnv(cfg)
-	assert.NilError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "Homer", cfg.User)
 	assert.Equal(t, 42, cfg.Age)
 	assert.Equal(t, true, cfg.Admin)

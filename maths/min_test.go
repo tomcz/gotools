@@ -3,7 +3,7 @@ package maths
 import (
 	"testing"
 
-	"gotest.tools/v3/assert"
+	assert "github.com/stretchr/testify/require"
 )
 
 func TestMin(t *testing.T) {
