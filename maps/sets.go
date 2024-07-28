@@ -15,15 +15,15 @@ func NewSetWithValue[K comparable, V any](value V, keys ...K) map[K]V {
 }
 
 // Contains returns true if this set contains the given key.
-func Contains[K comparable, V any](set map[K]V, key K) bool {
-	_, ok := set[key]
+func Contains[K comparable, V any](this map[K]V, key K) bool {
+	_, ok := this[key]
 	return ok
 }
 
 // ContainsAny returns true if this set contains any given key.
-func ContainsAny[K comparable, V any](set map[K]V, keys ...K) bool {
+func ContainsAny[K comparable, V any](this map[K]V, keys ...K) bool {
 	for _, key := range keys {
-		if Contains(set, key) {
+		if Contains(this, key) {
 			return true
 		}
 	}
@@ -31,9 +31,9 @@ func ContainsAny[K comparable, V any](set map[K]V, keys ...K) bool {
 }
 
 // ContainsAll returns true if this set contains every given key.
-func ContainsAll[K comparable, V any](set map[K]V, keys ...K) bool {
+func ContainsAll[K comparable, V any](this map[K]V, keys ...K) bool {
 	for _, key := range keys {
-		if !Contains(set, key) {
+		if !Contains(this, key) {
 			return false
 		}
 	}
@@ -61,9 +61,9 @@ func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 }
 
 // AddAll adds multiple keys to this set, each with the same value.
-func AddAll[K comparable, V any](set map[K]V, value V, keys ...K) {
+func AddAll[K comparable, V any](this map[K]V, value V, keys ...K) {
 	for _, key := range keys {
-		set[key] = value
+		this[key] = value
 	}
 }
 
@@ -75,9 +75,9 @@ func Update[K comparable, V any](this, other map[K]V) {
 }
 
 // RemoveAll removes multiple keys from this set.
-func RemoveAll[K comparable, V any](set map[K]V, keys ...K) {
+func RemoveAll[K comparable, V any](this map[K]V, keys ...K) {
 	for _, key := range keys {
-		delete(set, key)
+		delete(this, key)
 	}
 }
 
