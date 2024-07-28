@@ -3,7 +3,6 @@ package leader
 import (
 	"context"
 	"database/sql"
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -66,8 +65,7 @@ func AbortOnError(err error) error {
 
 // ContinueOnError is an example WithOnError strategy that logs
 // the error and allows the leadership election to proceed.
-func ContinueOnError(err error) error {
-	log.Printf("[WARNING] leadership error: %v\n", err)
+func ContinueOnError(_ error) error {
 	return nil
 }
 
