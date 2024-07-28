@@ -40,6 +40,16 @@ func ContainsAll[K comparable, V any](set map[K]V, keys ...K) bool {
 	return true
 }
 
+// AnyOf returns true if any key in this set is in the other set.
+func AnyOf[K comparable, V any](this, other map[K]V) bool {
+	for key := range this {
+		if Contains(other, key) {
+			return true
+		}
+	}
+	return false
+}
+
 // SubsetOf returns true if every key in this set is in the other set.
 func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 	for key := range this {

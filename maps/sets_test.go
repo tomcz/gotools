@@ -20,6 +20,9 @@ func TestGenericSets(t *testing.T) {
 	assert.True(t, ContainsAll(set, 1, 3, 5))
 	assert.False(t, ContainsAll(set, 1, 3, 7))
 
+	assert.True(t, AnyOf(set, NewSet(4, 5, 6)))
+	assert.False(t, AnyOf(set, NewSet(7, 8, 9)))
+
 	assert.True(t, SubsetOf(set, NewSet(1, 2, 3, 4, 5, 6, 7, 8, 9)))
 	assert.False(t, SubsetOf(set, NewSet(2, 3, 4, 5, 6, 7, 8, 9)))
 
