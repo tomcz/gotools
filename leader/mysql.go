@@ -63,7 +63,7 @@ func AbortOnError(err error) error {
 	return err
 }
 
-// ContinueOnError is an example WithOnError strategy that logs
+// ContinueOnError is an example WithOnError strategy that ignores
 // the error and allows the leadership election to proceed.
 func ContinueOnError(_ error) error {
 	return nil
