@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	assert "github.com/stretchr/testify/require"
+	"gotest.tools/v3/assert"
 )
 
 func TestIndex(t *testing.T) {
@@ -27,13 +27,13 @@ func TestIndexOfErr(t *testing.T) {
 	src := []int{1, 2, 3, 4, 5, 6}
 	selector := func(v int) (bool, error) { return v%2 == 0, nil }
 	actual, err := IndexOfErr(src, selector)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	assert.Equal(t, 1, actual)
 
 	src = []int{1, 3, 5, 7}
 	selector = func(v int) (bool, error) { return v%2 == 0, nil }
 	actual, err = IndexOfErr(src, selector)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	assert.Equal(t, -1, actual)
 
 	src = []int{1, 2, 3, 4, 5, 6}

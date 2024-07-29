@@ -12,8 +12,8 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	check "github.com/stretchr/testify/assert"
-	assert "github.com/stretchr/testify/require"
+	"gotest.tools/v3/assert"
+	is "gotest.tools/v3/assert/cmp"
 )
 
 const createLeaderTableSQL = `
@@ -80,18 +80,18 @@ func dropTestDatabase(dbName string) error {
 
 func TestSqlTools(t *testing.T) {
 	dbName, err := createTestDatabase()
-	assert.NoError(t, err, "createTestDatabase failed")
+	assert.NilError(t, err, "createTestDatabase failed")
 	defer func() {
 		dropErr := dropTestDatabase(dbName)
-		check.NoError(t, dropErr, "dropTestDatabase failed")
+		assert.Check(t, is.Nil(dropErr), "dropTestDatabase failed")
 	}()
 
 	db, err := sqlOpen(dbName)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	defer db.Close()
 
 	_, err = db.Exec(createLeaderTableSQL)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 
 	tests := []struct {
 		name   string
@@ -135,11 +135,11 @@ func testInTxxCommit(t *testing.T, db *sqlx.DB) {
 		}
 		return nil
 	})
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 
 	var results []testLeader
 	err = db.SelectContext(ctx, &results, selectLeadersSQL)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	for _, result := range results {
 		assert.Equal(t, leaders[result.Name], result.Node)
 	}
@@ -165,6 +165,6 @@ func testInTxxRollback(t *testing.T, db *sqlx.DB) {
 
 	var count int
 	err = db.GetContext(ctx, &count, countLeadersSQL, leaderName)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	assert.Equal(t, 0, count)
 }

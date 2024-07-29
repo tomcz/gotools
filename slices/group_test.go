@@ -5,7 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	assert "github.com/stretchr/testify/require"
+	"gotest.tools/v3/assert"
+	is "gotest.tools/v3/assert/cmp"
 )
 
 func TestGroup(t *testing.T) {
@@ -34,19 +35,19 @@ func TestGroup(t *testing.T) {
 		tokens := strings.Split(value, "_")
 		return tokens[0]
 	}
-	assert.Equal(t, expected, GroupBy(src, groupFunc))
+	assert.DeepEqual(t, expected, GroupBy(src, groupFunc))
 
 	groupFuncOk := func(value string) (string, error) {
 		return groupFunc(value), nil
 	}
 	actual, err := GroupByErr(src, groupFuncOk)
-	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.NilError(t, err)
+	assert.DeepEqual(t, expected, actual)
 
 	groupFuncBad := func(value string) (string, error) {
 		return "", errors.New("test error")
 	}
 	actual, err = GroupByErr(src, groupFuncBad)
 	assert.Error(t, err, "test error")
-	assert.Nil(t, actual)
+	assert.Assert(t, is.Nil(actual))
 }

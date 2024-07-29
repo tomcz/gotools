@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	assert "github.com/stretchr/testify/require"
+	"gotest.tools/v3/assert"
 )
 
 func TestChoose(t *testing.T) {
@@ -24,7 +24,7 @@ func TestChooseFuncE(t *testing.T) {
 	no := func() (string, error) { return "", errors.New("no") }
 
 	res, err := ChooseFuncE(true, yes, no)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	assert.Equal(t, "yes", res)
 
 	res, err = ChooseFuncE(false, yes, no)
