@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"k8s.io/utils/clock"
 )
 
 // MysqlOpt allows configuration of leader defaults.
@@ -33,13 +32,6 @@ func WithTick(tick time.Duration) MysqlOpt {
 func WithAge(age time.Duration) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.age = age
-	}
-}
-
-// WithClock replaces the default system clock.
-func WithClock(ck clock.WithTicker) MysqlOpt {
-	return func(leader *mysqlLeader) {
-		leader.clock = ck
 	}
 }
 
@@ -73,7 +65,6 @@ type mysqlLeader struct {
 	db         *sql.DB
 	leaderName string
 	nodeName   string
-	clock      clock.WithTicker
 	tick       time.Duration
 	age        time.Duration
 	onError    func(error) error
@@ -92,9 +83,6 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 	if leader.nodeName == "" {
 		leader.nodeName = uuid.NewString()
 	}
-	if leader.clock == nil {
-		leader.clock = clock.RealClock{}
-	}
 	if leader.tick < time.Second {
 		leader.tick = 15 * time.Second
 	}
@@ -108,12 +96,12 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 }
 
 func (m *mysqlLeader) Acquire(ctx context.Context) error {
-	ticker := m.clock.NewTicker(m.tick)
+	ticker := time.NewTicker(m.tick)
 	defer ticker.Stop()
 	for {
 		select {
-		case <-ticker.C():
-			if err := m.election(ctx); err != nil {
+		case now := <-ticker.C:
+			if err := m.election(ctx, now); err != nil {
 				return err
 			}
 		case <-ctx.Done():
@@ -145,8 +133,8 @@ node_name = IF(last_update < DATE_SUB(VALUES(last_update), INTERVAL ? SECOND), V
 last_update = IF(node_name = VALUES(node_name), VALUES(last_update), last_update)
 `
 
-func (m *mysqlLeader) election(ctx context.Context) error {
-	_, err := m.db.ExecContext(ctx, electionSQL, m.leaderName, m.nodeName, m.clock.Now(), int64(m.age.Seconds()))
+func (m *mysqlLeader) election(ctx context.Context, now time.Time) error {
+	_, err := m.db.ExecContext(ctx, electionSQL, m.leaderName, m.nodeName, now, int64(m.age.Seconds()))
 	if err != nil {
 		err = m.onError(err)
 	}

@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
-	clock "k8s.io/utils/clock/testing"
 )
 
 func sqlOpen(dbName string) (*sql.DB, error) {
@@ -102,17 +101,14 @@ func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 func testElectedIsLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
 
-	fake := clock.NewFakeClock(time.Now())
-
 	leader := &mysqlLeader{
 		db:         db,
 		leaderName: uuid.NewString(),
 		nodeName:   uuid.NewString(),
-		clock:      fake,
 		age:        10 * time.Second,
 	}
 
-	assert.NilError(t, leader.election(ctx))
+	assert.NilError(t, leader.election(ctx, time.Now()))
 
 	isLeader, err := leader.IsLeader(ctx)
 	assert.NilError(t, err)
@@ -122,27 +118,24 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
 	leaderName := uuid.NewString()
-
-	fake := clock.NewFakeClock(time.Now())
+	now := time.Now()
 
 	l1 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
 		nodeName:   uuid.NewString(),
-		clock:      fake,
 		age:        10 * time.Second,
 	}
 	l2 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
 		nodeName:   uuid.NewString(),
-		clock:      fake,
 		age:        10 * time.Second,
 	}
 
 	// l1 wins election
-	assert.NilError(t, l1.election(ctx))
-	assert.NilError(t, l2.election(ctx))
+	assert.NilError(t, l1.election(ctx, now))
+	assert.NilError(t, l2.election(ctx, now))
 
 	isLeader, err := l1.IsLeader(ctx)
 	assert.NilError(t, err)
@@ -153,9 +146,9 @@ func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	assert.Assert(t, !isLeader, "l2 should not be leader")
 
 	// l2 wins next election
-	fake.Step(11 * time.Second)
-	assert.NilError(t, l2.election(ctx))
-	assert.NilError(t, l1.election(ctx))
+	now = now.Add(11 * time.Second)
+	assert.NilError(t, l2.election(ctx, now))
+	assert.NilError(t, l1.election(ctx, now))
 
 	isLeader, err = l1.IsLeader(ctx)
 	assert.NilError(t, err)
