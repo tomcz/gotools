@@ -5,11 +5,11 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/go-viper/mapstructure/v2"
 )
 
 // PopulateFromEnv populates the target using environment variables and
-// mapstructure (https://github.com/mitchellh/mapstructure) mappings.
+// mapstructure (https://github.com/go-viper/mapstructure/v2) mappings.
 // Please note that the target must be a pointer to a struct.
 func PopulateFromEnv(target any) error {
 	r := reflect.TypeOf(target)
