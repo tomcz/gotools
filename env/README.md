@@ -1,6 +1,6 @@
 # env
 
-Populate structs from environment variables using [mapstructure](https://github.com/mitchellh/mapstructure).
+Populate structs from environment variables using [mapstructure](https://github.com/go-viper/mapstructure/v2).
 
 ```go
 import (
