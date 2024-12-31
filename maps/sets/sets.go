@@ -132,6 +132,6 @@ func Keys[K comparable, V any](this map[K]V) []K {
 }
 
 // SortedKeys returns a sorted slice of all keys from this set.
-func SortedKeys[K cmp.Ordered, V any](src map[K]V) []K {
-	return maps.SortedKeys(src)
+func SortedKeys[K cmp.Ordered, V any](this map[K]V) []K {
+	return maps.SortedKeys(this)
 }
