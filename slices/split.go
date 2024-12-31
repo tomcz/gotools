@@ -10,7 +10,7 @@ package slices
 // the required length without leaving a remainder.
 func Split[X any](src []X, partLen int) [][]X {
 	srcLen := len(src)
-	if srcLen == 0 {
+	if srcLen == 0 || partLen < 1 {
 		return nil
 	}
 	var dst [][]X
