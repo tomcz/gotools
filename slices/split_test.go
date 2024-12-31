@@ -2,8 +2,10 @@ package slices
 
 import (
 	"testing"
+	"testing/quick"
 
 	"gotest.tools/v3/assert"
+	is "gotest.tools/v3/assert/cmp"
 )
 
 func TestSplit(t *testing.T) {
@@ -78,5 +80,40 @@ func TestSplit(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			assert.DeepEqual(t, test.expected, Split(test.src, test.partLen))
 		})
+	}
+}
+
+func TestSplit_fuzz(t *testing.T) {
+	fn := func(src []int, partLen uint8) bool {
+		splits := Split(src, int(partLen))
+		if len(splits) == 0 && (len(src) == 0 || partLen == 0) {
+			return true
+		}
+		var joined []int
+		var minLen, maxLen int
+		for i, split := range splits {
+			joined = append(joined, split...)
+			splitLen := len(split)
+			if i == 0 {
+				minLen = splitLen
+				maxLen = splitLen
+			} else {
+				minLen = min(splitLen, minLen)
+				maxLen = max(splitLen, maxLen)
+			}
+		}
+		if !assert.Check(t, minLen <= int(partLen), "minLen %d, partLen %d", minLen, partLen) {
+			return false
+		}
+		if !assert.Check(t, maxLen <= int(partLen), "maxLen %d, partLen %d", maxLen, partLen) {
+			return false
+		}
+		if !assert.Check(t, is.DeepEqual(src, joined)) {
+			return false
+		}
+		return true
+	}
+	if err := quick.Check(fn, nil); err != nil {
+		t.Error(err)
 	}
 }
