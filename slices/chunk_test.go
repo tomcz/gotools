@@ -8,53 +8,78 @@ import (
 	is "gotest.tools/v3/assert/cmp"
 )
 
-func TestChunk_even(t *testing.T) {
-	in := []int{
-		1, 2, 3,
-		4, 5, 6,
-		7, 8, 9,
-		10,
+func TestChunk(t *testing.T) {
+	tests := []struct {
+		name     string
+		numParts int
+		src      []int
+		expected [][]int
+	}{
+		{
+			name:     "empty slice",
+			numParts: 2,
+			src:      nil,
+			expected: nil,
+		},
+		{
+			name:     "zero parts",
+			numParts: 0,
+			src:      []int{1, 2, 3},
+			expected: nil,
+		},
+		{
+			name:     "single part",
+			numParts: 1,
+			src:      []int{1, 2, 3},
+			expected: [][]int{{1, 2, 3}},
+		},
+		{
+			name:     "srcLen equals numParts",
+			numParts: 3,
+			src:      []int{1, 2, 3},
+			expected: [][]int{{1}, {2}, {3}},
+		},
+		{
+			name:     "srcLen is less than numParts",
+			numParts: 4,
+			src:      []int{1, 2, 3},
+			expected: [][]int{{1}, {2}, {3}, nil},
+		},
+		{
+			name:     "even chunks",
+			numParts: 2,
+			src: []int{
+				1, 2, 3,
+				4, 5, 6,
+				7, 8, 9,
+				10,
+			},
+			expected: [][]int{
+				{1, 2, 3, 4, 5},
+				{6, 7, 8, 9, 10},
+			},
+		},
+		{
+			name:     "uneven chunks",
+			numParts: 3,
+			src: []int{
+				1, 2, 3,
+				4, 5, 6,
+				7, 8, 9,
+				10,
+			},
+			expected: [][]int{
+				{1, 2, 3},
+				{4, 5, 6},
+				{7, 8, 9, 10},
+			},
+		},
 	}
-	expected := [][]int{
-		{1, 2, 3, 4, 5},
-		{6, 7, 8, 9, 10},
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			assert.DeepEqual(t, test.expected, Chunk(test.src, test.numParts))
+		})
 	}
-	assert.DeepEqual(t, expected, Chunk(in, 2))
-}
-
-func TestChunk_odd(t *testing.T) {
-	in := []int{
-		1, 2, 3,
-		4, 5, 6,
-		7, 8, 9,
-		10,
-	}
-	expected := [][]int{
-		{1, 2, 3},
-		{4, 5, 6},
-		{7, 8, 9, 10},
-	}
-	assert.DeepEqual(t, expected, Chunk(in, 3))
-}
-
-func TestChunk_exact(t *testing.T) {
-	in := []int{
-		1, 2, 3,
-	}
-	expected := [][]int{
-		{1}, {2}, {3},
-	}
-	assert.DeepEqual(t, expected, Chunk(in, 3))
-}
-
-func TestChunk_more(t *testing.T) {
-	in := []int{
-		1, 2, 3,
-	}
-	expected := [][]int{
-		{1}, {2}, {3}, nil,
-	}
-	assert.DeepEqual(t, expected, Chunk(in, 4))
 }
 
 func TestChunk_fuzz(t *testing.T) {
