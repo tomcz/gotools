@@ -1,4 +1,4 @@
-package maps
+package sets
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestGenericSets(t *testing.T) {
+func TestSets(t *testing.T) {
 	set := NewSet(1, 2, 3, 3, 4, 5, 5, 6)
 
 	assert.DeepEqual(t, []int{1, 2, 3, 4, 5, 6}, SortedKeys(set))

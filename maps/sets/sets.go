@@ -1,4 +1,10 @@
-package maps
+package sets
+
+import (
+	"cmp"
+
+	"github.com/tomcz/gotools/maps"
+)
 
 // NewSet creates a new set.
 func NewSet[K comparable](keys ...K) map[K]bool {
@@ -113,4 +119,14 @@ func Difference[K comparable, V any](this, other map[K]V) map[K]V {
 	Update(set, this)
 	Discard(set, other)
 	return set
+}
+
+// Keys returns an unsorted slice of all keys from this set.
+func Keys[K comparable, V any](this map[K]V) []K {
+	return maps.Keys(this)
+}
+
+// SortedKeys returns a sorted slice of all keys from this set.
+func SortedKeys[K cmp.Ordered, V any](src map[K]V) []K {
+	return maps.SortedKeys(src)
 }
