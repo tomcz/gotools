@@ -15,7 +15,7 @@ lint:
 ifeq ($(shell which golangci-lint),)
 	$(error "Please install golangci-lint from https://github.com/golangci/golangci-lint")
 endif
-	golangci-lint run
+	golangci-lint run --timeout 10m
 
 .PHONY: test
 test:
@@ -58,5 +58,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.22                  \
+		-t golang:1.23                  \
 		make test
