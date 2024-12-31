@@ -37,6 +37,26 @@ func TestChunk_odd(t *testing.T) {
 	assert.DeepEqual(t, expected, Chunk(in, 3))
 }
 
+func TestChunk_exact(t *testing.T) {
+	in := []int{
+		1, 2, 3,
+	}
+	expected := [][]int{
+		{1}, {2}, {3},
+	}
+	assert.DeepEqual(t, expected, Chunk(in, 3))
+}
+
+func TestChunk_more(t *testing.T) {
+	in := []int{
+		1, 2, 3,
+	}
+	expected := [][]int{
+		{1}, {2}, {3}, nil,
+	}
+	assert.DeepEqual(t, expected, Chunk(in, 4))
+}
+
 func TestChunk_fuzz(t *testing.T) {
 	fn := func(src []int, numParts uint8) bool {
 		chunks := Chunk(src, int(numParts))
