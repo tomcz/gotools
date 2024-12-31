@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-// Keys returns a randomly-sorted slice of map keys.
+// Keys returns an unsorted slice of map keys.
 func Keys[K comparable, V any](src map[K]V) []K {
 	keys := make([]K, 0, len(src))
 	for key := range src {
@@ -23,7 +23,7 @@ func SortedKeys[K cmp.Ordered, V any](src map[K]V) []K {
 	return keys
 }
 
-// Values returns a randomly-sorted slice of map values.
+// Values returns an unsorted slice of map values.
 func Values[K comparable, V any](src map[K]V) []V {
 	values := make([]V, 0, len(src))
 	for _, value := range src {
@@ -47,7 +47,7 @@ type Entry[K comparable, V any] struct {
 	Val V
 }
 
-// Entries returns a randomly-sorted slice of map entries.
+// Entries returns an unsorted slice of map entries.
 func Entries[K comparable, V any](src map[K]V) []Entry[K, V] {
 	dest := make([]Entry[K, V], 0, len(src))
 	for key, val := range src {
