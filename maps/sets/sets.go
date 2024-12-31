@@ -6,7 +6,7 @@ import (
 	"github.com/tomcz/gotools/maps"
 )
 
-// NewSet creates a new set.
+// NewSet creates a new set using "true" as the map value.
 func NewSet[K comparable](keys ...K) map[K]bool {
 	return NewSetWithValue(true, keys...)
 }
@@ -64,6 +64,11 @@ func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 		}
 	}
 	return true
+}
+
+// AddKeys to this set using "true" as the map value.
+func AddKeys[K comparable](this map[K]bool, keys ...K) {
+	AddAll(this, true, keys...)
 }
 
 // AddAll adds multiple keys to this set, each with the same value.

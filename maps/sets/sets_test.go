@@ -6,6 +6,11 @@ import (
 	"gotest.tools/v3/assert"
 )
 
+func TestNewSet(t *testing.T) {
+	set := NewSet(1, 1, 1, 1, 1, 1, 1, 1)
+	assert.DeepEqual(t, []int{1}, Keys(set))
+}
+
 func TestSets(t *testing.T) {
 	set := NewSet(1, 2, 3, 3, 4, 5, 5, 6)
 
@@ -26,7 +31,7 @@ func TestSets(t *testing.T) {
 	assert.Assert(t, SubsetOf(set, NewSet(1, 2, 3, 4, 5, 6, 7, 8, 9)))
 	assert.Assert(t, !SubsetOf(set, NewSet(2, 3, 4, 5, 6, 7, 8, 9)))
 
-	AddAll(set, true, 101, 102, 103)
+	AddKeys(set, 101, 102, 103)
 	expected := []int{1, 2, 3, 4, 5, 6, 101, 102, 103}
 	assert.DeepEqual(t, expected, SortedKeys(set))
 
