@@ -66,13 +66,17 @@ func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 	return true
 }
 
-// AddKeys to this set using "true" as the map value.
-func AddKeys[K comparable](this map[K]bool, keys ...K) {
-	AddAll(this, true, keys...)
+// Add all given keys to this set using "true" as the map value.
+//
+// Useful for sets created by NewSet.
+func Add[K comparable](this map[K]bool, keys ...K) {
+	AddWithValue(this, true, keys...)
 }
 
-// AddAll adds multiple keys to this set, each with the same value.
-func AddAll[K comparable, V any](this map[K]V, value V, keys ...K) {
+// AddWithValue adds multiple keys to this set, each with the same value.
+//
+// Useful for sets created by NewSetWithValue.
+func AddWithValue[K comparable, V any](this map[K]V, value V, keys ...K) {
 	for _, key := range keys {
 		this[key] = value
 	}
@@ -85,14 +89,14 @@ func Update[K comparable, V any](this, other map[K]V) {
 	}
 }
 
-// RemoveAll removes multiple keys from this set.
-func RemoveAll[K comparable, V any](this map[K]V, keys ...K) {
+// Remove all keys from this set that exist in the given slice.
+func Remove[K comparable, V any](this map[K]V, keys ...K) {
 	for _, key := range keys {
 		delete(this, key)
 	}
 }
 
-// Discard removes all keys from this set that exist in the other set.
+// Discard all keys from this set that exist in the other set.
 func Discard[K comparable, V any](this, other map[K]V) {
 	for key := range other {
 		delete(this, key)

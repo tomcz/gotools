@@ -31,11 +31,11 @@ func TestSets(t *testing.T) {
 	assert.Assert(t, SubsetOf(set, NewSet(1, 2, 3, 4, 5, 6, 7, 8, 9)))
 	assert.Assert(t, !SubsetOf(set, NewSet(2, 3, 4, 5, 6, 7, 8, 9)))
 
-	AddKeys(set, 101, 102, 103)
+	Add(set, 101, 102, 103)
 	expected := []int{1, 2, 3, 4, 5, 6, 101, 102, 103}
 	assert.DeepEqual(t, expected, SortedKeys(set))
 
-	RemoveAll(set, 101, 102, 103)
+	Remove(set, 101, 102, 103)
 	expected = []int{1, 2, 3, 4, 5, 6}
 	assert.DeepEqual(t, expected, SortedKeys(set))
 
