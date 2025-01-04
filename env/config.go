@@ -32,6 +32,9 @@ func PopulateFromEnv(target any, tag ...string) error {
 	}
 	envVars := map[string]string{}
 	for _, key := range keys {
+		if key == "" {
+			continue
+		}
 		if val, ok := os.LookupEnv(key); ok {
 			envVars[key] = val
 		}
