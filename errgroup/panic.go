@@ -52,24 +52,24 @@ func NewContext(ctx context.Context, opts ...Opt) (Group, context.Context) {
 	return pg, ctx
 }
 
-func (p *panicGroup) configure(opts []Opt) {
+func (pg *panicGroup) configure(opts []Opt) {
 	for _, opt := range opts {
-		opt(p)
+		opt(pg)
 	}
-	if p.handle == nil {
-		p.handle = defaultPanicHandler
+	if pg.handle == nil {
+		pg.handle = defaultPanicHandler
 	}
 }
 
-func (p *panicGroup) Wait() error {
-	return p.group.Wait()
+func (pg *panicGroup) Wait() error {
+	return pg.group.Wait()
 }
 
-func (p *panicGroup) Go(f func() error) {
-	p.group.Go(func() (err error) {
+func (pg *panicGroup) Go(f func() error) {
+	pg.group.Go(func() (err error) {
 		defer func() {
-			if r := recover(); r != nil {
-				err = p.handle(r)
+			if p := recover(); p != nil {
+				err = pg.handle(p)
 			}
 		}()
 		return f()
@@ -78,8 +78,8 @@ func (p *panicGroup) Go(f func() error) {
 
 func defaultPanicHandler(p any) error {
 	stack := string(debug.Stack())
-	if ex, ok := p.(error); ok {
-		return fmt.Errorf("panic: %w\nstack: %s", ex, stack)
+	if err, ok := p.(error); ok {
+		return fmt.Errorf("panic: %w\nstack: %s", err, stack)
 	}
 	return fmt.Errorf("panic: %+v\nstack: %s", p, stack)
 }
