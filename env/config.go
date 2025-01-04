@@ -11,7 +11,11 @@ import (
 // PopulateFromEnv populates the target using environment variables and
 // mapstructure (https://github.com/go-viper/mapstructure/v2) mappings.
 // Please note that the target must be a pointer to a struct.
-func PopulateFromEnv(target any) error {
+func PopulateFromEnv(target any, tag ...string) error {
+	tagName := "mapstructure"
+	for _, name := range tag {
+		tagName = name
+	}
 	r := reflect.TypeOf(target)
 	if r.Kind() != reflect.Ptr {
 		return errors.New("target must be a pointer")
@@ -23,14 +27,23 @@ func PopulateFromEnv(target any) error {
 	count := r.NumField()
 	keys := make([]string, count)
 	for i := 0; i < count; i++ {
-		k := r.Field(i).Tag.Get("mapstructure")
+		k := r.Field(i).Tag.Get(tagName)
 		keys[i] = k
 	}
-	data := map[string]string{}
+	envVars := map[string]string{}
 	for _, key := range keys {
 		if val, ok := os.LookupEnv(key); ok {
-			data[key] = val
+			envVars[key] = val
 		}
 	}
-	return mapstructure.WeakDecode(data, target)
+	config := &mapstructure.DecoderConfig{
+		TagName:          tagName,
+		Result:           target,
+		WeaklyTypedInput: true,
+	}
+	decoder, err := mapstructure.NewDecoder(config)
+	if err != nil {
+		return err
+	}
+	return decoder.Decode(envVars)
 }
