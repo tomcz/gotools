@@ -11,10 +11,10 @@ import (
 )
 
 type testCfg struct {
-	User  string `mapstructure:"test_user_name"`
-	Age   int    `mapstructure:"test_user_age"`
-	Admin bool   `mapstructure:"test_is_admin"`
-	Port  int    `mapstructure:"port"`
+	User  string `env:"test_user_name"`
+	Age   int    `env:"test_user_age"`
+	Admin bool   `env:"test_is_admin"`
+	Port  int    `env:"port"`
 }
 
 func TestEnv(t *testing.T) {
@@ -22,11 +22,9 @@ func TestEnv(t *testing.T) {
 	os.Setenv("test_user_age", "42")
 	os.Setenv("test_is_admin", "true")
 
-	cfg := &testCfg{
-		Port: 8080,
-	}
+	cfg := &testCfg{Port: 8080}
 
-	err := env.PopulateFromEnv(cfg)
+	err := env.PopulateFromEnv(cfg, "env")
 
 	assert.NilError(t, err)
 	assert.Equal(t, "Homer", cfg.User)
