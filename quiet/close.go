@@ -50,7 +50,7 @@ func CloseFuncE(close func() error) {
 	Close(&quietCloserE{close})
 }
 
-// CloseWithTimeout provides a closer for graceful service shutdown.
+// CloseWithTimeout quiety invokes the given function with the timeout set on its context.
 // Any errors or panics will be logged by the package logger.
 func CloseWithTimeout(close func(ctx context.Context) error, timeout time.Duration) {
 	Close(&timeoutCloser{close: close, timeout: timeout})
