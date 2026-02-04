@@ -1,14 +1,14 @@
 BASE_DIR ?= $(shell git rev-parse --show-toplevel 2>/dev/null)
 
 .PHONY: precommit
-precommit: format lint test
+precommit: format lint tidy test
 
 .PHONY: format
 format:
-ifeq ($(shell which goimports),)
-	go install golang.org/x/tools/cmd/goimports@latest
+ifeq ($(shell which golangci-lint),)
+	$(error "Please install golangci-lint from https://github.com/golangci/golangci-lint")
 endif
-	goimports -w -local github.com/tomcz/gotools .
+	golangci-lint fmt
 
 .PHONY: lint
 lint:
@@ -16,6 +16,10 @@ ifeq ($(shell which golangci-lint),)
 	$(error "Please install golangci-lint from https://github.com/golangci/golangci-lint")
 endif
 	golangci-lint run --timeout 10m
+
+.PHONY: tidy
+tidy:
+	go mod tidy
 
 .PHONY: test
 test:
@@ -25,11 +29,7 @@ else
 	go test -race -cover ./...
 endif
 
-.PHONY: tidy
-tidy:
-	go mod tidy
-
-COMPOSE_CMD := docker compose -p gotools -f scripts/docker-compose.yml
+COMPOSE_CMD := docker-compose -p gotools -f scripts/docker-compose.yml
 
 .PHONY: docker
 docker:
@@ -58,5 +58,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.23                  \
+		-t golang:1.25                  \
 		make test
