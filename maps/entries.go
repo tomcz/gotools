@@ -2,6 +2,7 @@ package maps
 
 import (
 	"cmp"
+	"slices"
 	"sort"
 )
 
@@ -17,9 +18,7 @@ func Keys[K comparable, V any](src map[K]V) []K {
 // SortedKeys returns a sorted slice of map keys.
 func SortedKeys[K cmp.Ordered, V any](src map[K]V) []K {
 	keys := Keys(src)
-	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] < keys[j]
-	})
+	slices.Sort(keys)
 	return keys
 }
 
@@ -35,9 +34,7 @@ func Values[K comparable, V any](src map[K]V) []V {
 // SortedValues returns a sorted slice of map values.
 func SortedValues[K comparable, V cmp.Ordered](src map[K]V) []V {
 	values := Values(src)
-	sort.Slice(values, func(i, j int) bool {
-		return values[i] < values[j]
-	})
+	slices.Sort(values)
 	return values
 }
 

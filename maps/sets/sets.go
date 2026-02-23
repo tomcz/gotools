@@ -2,6 +2,7 @@ package sets
 
 import (
 	"cmp"
+	sdk "maps"
 
 	"github.com/tomcz/gotools/maps"
 )
@@ -84,9 +85,7 @@ func AddWithValue[K comparable, V any](this map[K]V, value V, keys ...K) {
 
 // Update adds every key from the other set to this set.
 func Update[K comparable, V any](this, other map[K]V) {
-	for key, value := range other {
-		this[key] = value
-	}
+	sdk.Copy(this, other)
 }
 
 // Remove all keys from this set that exist in the given slice.

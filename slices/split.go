@@ -15,10 +15,7 @@ func Split[X any](src []X, partLen int) [][]X {
 	}
 	var dst [][]X
 	for a := 0; a < srcLen; a += partLen {
-		z := a + partLen
-		if z > srcLen {
-			z = srcLen
-		}
+		z := min(a+partLen, srcLen)
 		dst = append(dst, src[a:z])
 	}
 	return dst

@@ -19,13 +19,13 @@ func Chunk[X any](src []X, numParts int) [][]X {
 	}
 	chunks := make([][]X, numParts)
 	if numParts >= srcLen {
-		for i := 0; i < srcLen; i++ {
+		for i := range srcLen {
 			chunks[i] = []X{src[i]}
 		}
 		return chunks
 	}
 	begin := 0
-	for i := 0; i < numParts; i++ {
+	for i := range numParts {
 		end := ((i + 1) * srcLen) / numParts
 		chunks[i] = src[begin:end]
 		begin = end
