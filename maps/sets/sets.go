@@ -2,9 +2,8 @@ package sets
 
 import (
 	"cmp"
-	sdk "maps"
-
-	"github.com/tomcz/gotools/maps"
+	"maps"
+	"slices"
 )
 
 // NewSet creates a new set using "true" as the map value.
@@ -85,7 +84,7 @@ func AddWithValue[K comparable, V any](this map[K]V, value V, keys ...K) {
 
 // Update adds every key from the other set to this set.
 func Update[K comparable, V any](this, other map[K]V) {
-	sdk.Copy(this, other)
+	maps.Copy(this, other)
 }
 
 // Remove all keys from this set that exist in the given slice.
@@ -131,10 +130,10 @@ func Difference[K comparable, V any](this, other map[K]V) map[K]V {
 
 // Keys returns an unsorted slice of all keys from this set.
 func Keys[K comparable, V any](this map[K]V) []K {
-	return maps.Keys(this)
+	return slices.Collect(maps.Keys(this))
 }
 
 // SortedKeys returns a sorted slice of all keys from this set.
 func SortedKeys[K cmp.Ordered, V any](this map[K]V) []K {
-	return maps.SortedKeys(this)
+	return slices.Sorted(maps.Keys(this))
 }
