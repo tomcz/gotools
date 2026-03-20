@@ -15,7 +15,7 @@ lint:
 ifeq ($(shell which golangci-lint),)
 	$(error "Please install golangci-lint from https://github.com/golangci/golangci-lint")
 endif
-	golangci-lint run --timeout 10m
+	golangci-lint run --timeout 10m --build-tags integration
 
 .PHONY: tidy
 tidy:

@@ -4,13 +4,12 @@ package txx
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
@@ -54,7 +53,7 @@ func sqlOpen(dbName string) (*sql.DB, error) {
 }
 
 func createTestDatabase() (string, error) {
-	dbName := strings.ReplaceAll("test"+uuid.NewString(), "-", "")
+	dbName := "test" + rand.Text()
 	db, err := sqlOpen("")
 	if err != nil {
 		return "", err
@@ -122,8 +121,8 @@ type testLeader struct {
 func testInTxxCommit(t *testing.T, db *sqlx.DB) {
 	ctx := context.Background()
 	leaders := map[string]string{
-		uuid.NewString(): uuid.NewString(),
-		uuid.NewString(): uuid.NewString(),
+		rand.Text(): rand.Text(),
+		rand.Text(): rand.Text(),
 	}
 	err := InTxx(ctx, db, func(tx *sqlx.Tx) error {
 		for leader, node := range leaders {
@@ -147,10 +146,10 @@ func testInTxxCommit(t *testing.T, db *sqlx.DB) {
 
 func testInTxxRollback(t *testing.T, db *sqlx.DB) {
 	ctx := context.Background()
-	leaderName := uuid.NewString()
+	leaderName := rand.Text()
 	leaders := []map[string]any{
-		{"leader": leaderName, "node": uuid.NewString()},
-		{"leader": leaderName, "node": uuid.NewString()},
+		{"leader": leaderName, "node": rand.Text()},
+		{"leader": leaderName, "node": rand.Text()},
 	}
 	err := InTxx(ctx, db, func(tx *sqlx.Tx) error {
 		for _, data := range leaders {

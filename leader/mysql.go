@@ -2,17 +2,16 @@ package leader
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // MysqlOpt allows configuration of leader defaults.
 type MysqlOpt func(leader *mysqlLeader)
 
 // WithNodeName allows the node name to be specified.
-// The default value is a random UUID.
+// The default value is created by rand.Text.
 func WithNodeName(name string) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.nodeName = name
@@ -81,7 +80,7 @@ func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
 		opt(leader)
 	}
 	if leader.nodeName == "" {
-		leader.nodeName = uuid.NewString()
+		leader.nodeName = rand.Text()
 	}
 	if leader.tick < time.Second {
 		leader.tick = 15 * time.Second

@@ -4,14 +4,13 @@ package leader
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
 )
@@ -27,7 +26,7 @@ func sqlOpen(dbName string) (*sql.DB, error) {
 }
 
 func createTestDatabase() (string, error) {
-	dbName := strings.ReplaceAll("test"+uuid.NewString(), "-", "")
+	dbName := "test" + rand.Text()
 	db, err := sqlOpen("")
 	if err != nil {
 		return "", err
@@ -91,7 +90,7 @@ func TestMysqlLeader(t *testing.T) {
 
 func testUnelectedIsNotLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
-	leaderName := uuid.NewString()
+	leaderName := rand.Text()
 	leader := NewMysqlLeader(db, leaderName)
 	isLeader, err := leader.IsLeader(ctx)
 	assert.NilError(t, err)
@@ -103,8 +102,8 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 
 	leader := &mysqlLeader{
 		db:         db,
-		leaderName: uuid.NewString(),
-		nodeName:   uuid.NewString(),
+		leaderName: rand.Text(),
+		nodeName:   rand.Text(),
 		age:        10 * time.Second,
 	}
 
@@ -117,19 +116,19 @@ func testElectedIsLeader(t *testing.T, db *sql.DB) {
 
 func testElectionWinnerIsLeader(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
-	leaderName := uuid.NewString()
+	leaderName := rand.Text()
 	now := time.Now()
 
 	l1 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
-		nodeName:   uuid.NewString(),
+		nodeName:   rand.Text(),
 		age:        10 * time.Second,
 	}
 	l2 := &mysqlLeader{
 		db:         db,
 		leaderName: leaderName,
-		nodeName:   uuid.NewString(),
+		nodeName:   rand.Text(),
 		age:        10 * time.Second,
 	}
 

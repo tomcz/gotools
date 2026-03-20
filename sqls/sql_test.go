@@ -4,14 +4,13 @@ package sqls
 
 import (
 	"context"
+	"crypto/rand"
 	"database/sql"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
 )
@@ -54,7 +53,7 @@ func sqlOpen(dbName string) (*sql.DB, error) {
 }
 
 func createTestDatabase() (string, error) {
-	dbName := strings.ReplaceAll("test"+uuid.NewString(), "-", "")
+	dbName := "test" + rand.Text()
 	db, err := sqlOpen("")
 	if err != nil {
 		return "", err
@@ -127,12 +126,12 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 		node   string
 	}{
 		{
-			leader: uuid.NewString(),
-			node:   uuid.NewString(),
+			leader: rand.Text(),
+			node:   rand.Text(),
 		},
 		{
-			leader: uuid.NewString(),
-			node:   uuid.NewString(),
+			leader: rand.Text(),
+			node:   rand.Text(),
 		},
 	}
 	err := InTx(db, func(tx *sql.Tx) error {
@@ -162,18 +161,18 @@ func testInTxCommit(t *testing.T, db *sql.DB) {
 }
 
 func testInTxRollback(t *testing.T, db *sql.DB) {
-	leaderName := uuid.NewString()
+	leaderName := rand.Text()
 	leaders := []struct {
 		leader string
 		node   string
 	}{
 		{
 			leader: leaderName,
-			node:   uuid.NewString(),
+			node:   rand.Text(),
 		},
 		{
 			leader: leaderName,
-			node:   uuid.NewString(),
+			node:   rand.Text(),
 		},
 	}
 	err := InTx(db, func(tx *sql.Tx) error {
@@ -199,12 +198,12 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 		node   string
 	}{
 		{
-			leader: uuid.NewString(),
-			node:   uuid.NewString(),
+			leader: rand.Text(),
+			node:   rand.Text(),
 		},
 		{
-			leader: uuid.NewString(),
-			node:   uuid.NewString(),
+			leader: rand.Text(),
+			node:   rand.Text(),
 		},
 	}
 	err := InTxContext(ctx, db, func(tx *sql.Tx) error {
@@ -235,18 +234,18 @@ func testInTxContextCommit(t *testing.T, db *sql.DB) {
 
 func testInTxContextRollback(t *testing.T, db *sql.DB) {
 	ctx := context.Background()
-	leaderName := uuid.NewString()
+	leaderName := rand.Text()
 	leaders := []struct {
 		leader string
 		node   string
 	}{
 		{
 			leader: leaderName,
-			node:   uuid.NewString(),
+			node:   rand.Text(),
 		},
 		{
 			leader: leaderName,
-			node:   uuid.NewString(),
+			node:   rand.Text(),
 		},
 	}
 	err := InTxContext(ctx, db, func(tx *sql.Tx) error {
