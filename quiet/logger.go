@@ -6,21 +6,33 @@ type Logger interface {
 	Panic(p any)
 }
 
-var log Logger = noopLogger{}
-
-// SetLogger sets a panic & error logger for this package
-// rather than the default noop logger. Passing in a nil
-// logger will reset the package logger to default.
-func SetLogger(logger Logger) {
-	if logger == nil {
-		log = noopLogger{}
-	} else {
-		log = logger
-	}
-}
-
 type noopLogger struct{}
 
 func (n noopLogger) Error(error) {}
 
 func (n noopLogger) Panic(any) {}
+
+// Collector is a Logger variant that collects all
+// encountered errors and panics for later review.
+type Collector struct {
+	Errors []error
+	Panics []any
+}
+
+// enforce interface implementation
+var _ Logger = (*Collector)(nil)
+
+// Error appends the error to the Errors slice.
+func (c *Collector) Error(err error) {
+	c.Errors = append(c.Errors, err)
+}
+
+// Panic appends the panic to the Panics slice.
+func (c *Collector) Panic(p any) {
+	c.Panics = append(c.Panics, p)
+}
+
+// IsEmpty returns true if there aren't any errors or panics.
+func (c *Collector) IsEmpty() bool {
+	return len(c.Errors)+len(c.Panics) == 0
+}

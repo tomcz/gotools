@@ -2,10 +2,12 @@ package quiet
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
 	"gotest.tools/v3/assert"
+	is "gotest.tools/v3/assert/cmp"
 )
 
 func TestCloserOrder(t *testing.T) {
@@ -39,4 +41,23 @@ func TestCloserOrder(t *testing.T) {
 
 	assert.NilError(t, closer.Close())
 	assert.DeepEqual(t, []string{"5", "4", "3", "2", "1"}, called)
+}
+
+func TestCloserLogger(t *testing.T) {
+	logger := &Collector{}
+
+	closer := &Closer{}
+	closer.Logger(logger)
+
+	testPanic := errors.New("test panic")
+	closer.AddFunc(func() { panic(testPanic) })
+
+	testError := errors.New("test error")
+	closer.AddFuncE(func() error { return testError })
+
+	closer.CloseAll()
+
+	assert.Assert(t, !logger.IsEmpty())
+	assert.Assert(t, is.Contains(logger.Panics, testPanic))
+	assert.Assert(t, is.Contains(logger.Errors, testError))
 }
