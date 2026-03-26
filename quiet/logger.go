@@ -8,7 +8,7 @@ type Logger interface {
 
 var log Logger = noopLogger{}
 
-// SetLogger sets a panic & error logger for the package
+// SetLogger sets a panic & error logger for this package
 // rather than the default noop logger. Passing in a nil
 // logger will reset the package logger to default.
 func SetLogger(logger Logger) {
