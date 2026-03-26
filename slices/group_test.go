@@ -9,7 +9,7 @@ import (
 	is "gotest.tools/v3/assert/cmp"
 )
 
-func TestGroup(t *testing.T) {
+func TestGroupBy(t *testing.T) {
 	src := []string{
 		"one_foo",
 		"one_bar",

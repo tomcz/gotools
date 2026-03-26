@@ -2,9 +2,11 @@ package slices
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"gotest.tools/v3/assert"
+	is "gotest.tools/v3/assert/cmp"
 )
 
 func TestIndex(t *testing.T) {
@@ -41,4 +43,37 @@ func TestIndexOfErr(t *testing.T) {
 	actual, err = IndexOfErr(src, selector)
 	assert.Error(t, err, "test error")
 	assert.Equal(t, -1, actual)
+}
+
+func TestIndexBy(t *testing.T) {
+	src := []string{
+		"one_foo",
+		"one_bar",
+		"one_wee",
+		"two_foo",
+	}
+	expected := map[string]string{
+		"one": "one_wee",
+		"two": "two_foo",
+	}
+
+	indexFunc := func(value string) string {
+		tokens := strings.Split(value, "_")
+		return tokens[0]
+	}
+	assert.DeepEqual(t, expected, IndexBy(src, indexFunc))
+
+	indexFuncOk := func(value string) (string, error) {
+		return indexFunc(value), nil
+	}
+	actual, err := IndexByErr(src, indexFuncOk)
+	assert.NilError(t, err)
+	assert.DeepEqual(t, expected, actual)
+
+	indexFuncBad := func(value string) (string, error) {
+		return "", errors.New("test error")
+	}
+	actual, err = IndexByErr(src, indexFuncBad)
+	assert.Error(t, err, "test error")
+	assert.Assert(t, is.Nil(actual))
 }
