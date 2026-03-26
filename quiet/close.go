@@ -6,27 +6,8 @@ import (
 	"time"
 )
 
-// Logger allows logging of errors and panics.
-type Logger interface {
-	Error(err error)
-	Panic(p any)
-}
-
-var log Logger = noopLogger{}
-
-// SetLogger sets a panic & error logger for the package
-// rather than the default noop logger. Passing in a nil
-// logger will reset the package logger to default.
-func SetLogger(logger Logger) {
-	if logger == nil {
-		log = noopLogger{}
-	} else {
-		log = logger
-	}
-}
-
 // Close quietly invokes the closer.
-// Any errors or panics will be logged by the package logger.
+// Any errors or panics will be logged by this package's Logger.
 func Close(closer io.Closer) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -39,19 +20,19 @@ func Close(closer io.Closer) {
 }
 
 // CloseFunc quietly invokes the given function.
-// Any panics will be logged by the package logger.
+// Any panics will be logged by this package's Logger.
 func CloseFunc(close func()) {
 	Close(&quietCloser{close})
 }
 
 // CloseFuncE quietly invokes the given function.
-// Any errors or panics will be logged by the package logger.
+// Any errors or panics will be logged by this package's Logger.
 func CloseFuncE(close func() error) {
 	Close(&quietCloserE{close})
 }
 
 // CloseWithTimeout quiety invokes the given function with the timeout set on its context.
-// Any errors or panics will be logged by the package logger.
+// Any errors or panics will be logged by this package's Logger.
 func CloseWithTimeout(close func(ctx context.Context) error, timeout time.Duration) {
 	Close(&timeoutCloser{close: close, timeout: timeout})
 }
@@ -83,9 +64,3 @@ func (c *timeoutCloser) Close() error {
 	defer cancel()
 	return c.close(ctx)
 }
-
-type noopLogger struct{}
-
-func (n noopLogger) Error(error) {}
-
-func (n noopLogger) Panic(any) {}
