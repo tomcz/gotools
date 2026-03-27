@@ -40,6 +40,7 @@ func TestSets(t *testing.T) {
 	assert.DeepEqual(t, expected, SortedKeys(set))
 
 	assert.DeepEqual(t, []int{1, 2, 3, 4, 5, 6, 7, 8}, SortedKeys(Union(set, NewSet(5, 6, 7, 8))))
+	assert.DeepEqual(t, []int{1, 2, 3, 4, 7, 8}, SortedKeys(SymmetricDifference(set, NewSet(5, 6, 7, 8))))
 	assert.DeepEqual(t, []int{1, 2, 3, 4}, SortedKeys(Difference(set, NewSet(5, 6, 7, 8))))
 	assert.DeepEqual(t, []int{5, 6}, SortedKeys(Intersection(set, NewSet(5, 6, 7, 8))))
 }

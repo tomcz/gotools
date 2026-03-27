@@ -128,6 +128,13 @@ func Difference[K comparable, V any](this, other map[K]V) map[K]V {
 	return set
 }
 
+// SymmetricDifference returns a new set with keys in either this set or other but not both.
+func SymmetricDifference[K comparable, V any](this, other map[K]V) map[K]V {
+	set := Union(this, other)
+	Discard(set, Intersection(this, other))
+	return set
+}
+
 // Keys returns an unsorted slice of all keys from this set.
 func Keys[K comparable, V any](this map[K]V) []K {
 	return slices.Collect(maps.Keys(this))
