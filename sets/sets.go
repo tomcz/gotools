@@ -14,9 +14,7 @@ func NewSet[K comparable](keys ...K) map[K]bool {
 // NewSetWithValue creates a set with each key given the same value.
 func NewSetWithValue[K comparable, V any](value V, keys ...K) map[K]V {
 	set := make(map[K]V)
-	for _, key := range keys {
-		set[key] = value
-	}
+	AddWithValue(set, value, keys...)
 	return set
 }
 
