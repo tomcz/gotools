@@ -8,12 +8,16 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// Group provides an interface compatible with golang.org/x/sync/errgroup
-// for instances that enhance the capabilities of Groups.
+// Group provides an interface compatible with [golang.org/x/sync/errgroup.Group].
 type Group interface {
 	Go(f func() error)
+	TryGo(f func() error) bool
+	SetLimit(n int)
 	Wait() error
 }
+
+var _ Group = (*errgroup.Group)(nil)
+var _ Group = (*panicGroup)(nil)
 
 // PanicHandler processes the recovered panic.
 type PanicHandler func(p any) error
@@ -33,8 +37,7 @@ func WithPanicHandler(ph PanicHandler) Opt {
 	}
 }
 
-// New creates a panic-handling Group,
-// without any context cancellation.
+// New creates a panic-handling [Group] without any context cancellation.
 func New(opts ...Opt) Group {
 	group := &errgroup.Group{}
 	pg := &panicGroup{group: group}
@@ -42,7 +45,7 @@ func New(opts ...Opt) Group {
 	return pg
 }
 
-// NewContext creates a panic-handling Group.
+// NewContext creates a panic-handling [Group].
 // The returned context is cancelled on first error,
 // first panic, or when the Wait function exits.
 func NewContext(ctx context.Context, opts ...Opt) (Group, context.Context) {
@@ -61,10 +64,6 @@ func (pg *panicGroup) configure(opts []Opt) {
 	}
 }
 
-func (pg *panicGroup) Wait() error {
-	return pg.group.Wait()
-}
-
 func (pg *panicGroup) Go(f func() error) {
 	pg.group.Go(func() (err error) {
 		defer func() {
@@ -74,6 +73,25 @@ func (pg *panicGroup) Go(f func() error) {
 		}()
 		return f()
 	})
+}
+
+func (pg *panicGroup) TryGo(f func() error) bool {
+	return pg.group.TryGo(func() (err error) {
+		defer func() {
+			if p := recover(); p != nil {
+				err = pg.handle(p)
+			}
+		}()
+		return f()
+	})
+}
+
+func (pg *panicGroup) SetLimit(n int) {
+	pg.group.SetLimit(n)
+}
+
+func (pg *panicGroup) Wait() error {
+	return pg.group.Wait()
 }
 
 func defaultPanicHandler(p any) error {
