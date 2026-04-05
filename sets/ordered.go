@@ -9,7 +9,7 @@ import (
 // Uses ordered keys to allow us to have stable JSON output.
 type Set[K cmp.Ordered] map[K]bool
 
-// New set creation from keys. Behaves like NewSet.
+// New creates an ordered set using NewSet.
 func New[K cmp.Ordered](keys ...K) Set[K] {
 	return NewSet(keys...)
 }
