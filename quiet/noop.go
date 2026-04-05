@@ -4,7 +4,7 @@ import "io"
 
 type noopCloser struct{}
 
-// Noop returns a closer that does nothing.
+// Noop returns an [io.Closer] that does nothing.
 func Noop() io.Closer {
 	return noopCloser{}
 }

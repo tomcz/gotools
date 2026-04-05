@@ -37,7 +37,7 @@ func IndexOfErr[V any](src []V, selector func(V) (bool, error)) (int, error) {
 // IndexBy indexes the given values by the result of the key function.
 // Duplicate keys produced by the key function are handled as last-one-wins.
 // If you intend for the key function to produce duplicate keys then
-// you really should be using the GroupBy function instead.
+// you really should be using the [GroupBy] function instead.
 func IndexBy[K comparable, V any](src []V, keyFn func(V) K) map[K]V {
 	dest := make(map[K]V)
 	for _, value := range src {
@@ -50,7 +50,7 @@ func IndexBy[K comparable, V any](src []V, keyFn func(V) K) map[K]V {
 // IndexByErr allows the key function to fail and returns the failing error.
 // Duplicate keys produced by the key function are handled as last-one-wins.
 // If you intend for the key function to produce duplicate keys then
-// you really should be using the GroupByErr function instead.
+// you really should be using the [GroupByErr] function instead.
 func IndexByErr[K comparable, V any](src []V, keyFn func(V) (K, error)) (map[K]V, error) {
 	dest := make(map[K]V)
 	for _, value := range src {

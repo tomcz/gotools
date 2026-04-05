@@ -66,14 +66,14 @@ func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 
 // Add all given keys to this set using "true" as the map value.
 //
-// Useful for sets created by NewSet.
+// Useful for sets created by [New] and [NewSet].
 func Add[K comparable](this map[K]bool, keys ...K) {
 	AddWithValue(this, true, keys...)
 }
 
 // AddWithValue adds multiple keys to this set, each with the same value.
 //
-// Useful for sets created by NewSetWithValue.
+// Useful for sets created by [NewSetWithValue].
 func AddWithValue[K comparable, V any](this map[K]V, value V, keys ...K) {
 	for _, key := range keys {
 		this[key] = value

@@ -11,7 +11,7 @@ import (
 type MysqlOpt func(leader *mysqlLeader)
 
 // WithNodeName allows the node name to be specified.
-// The default value is created by rand.Text.
+// The default value is created by [rand.Text].
 func WithNodeName(name string) MysqlOpt {
 	return func(leader *mysqlLeader) {
 		leader.nodeName = name
@@ -36,7 +36,7 @@ func WithAge(age time.Duration) MysqlOpt {
 
 // WithOnError allows the default strategy of
 // terminating leadership elections on errors
-// during the Leader.Acquire blocking call to
+// during the [Leader.Acquire] blocking call to
 // be replaced with something more nuanced.
 // If the onError strategy returns a non-nil
 // error value, the blocking call will exit
@@ -49,12 +49,12 @@ func WithOnError(onError func(error) error) MysqlOpt {
 	}
 }
 
-// AbortOnError is the default WithOnError strategy.
+// AbortOnError is the default [WithOnError] strategy.
 func AbortOnError(err error) error {
 	return err
 }
 
-// ContinueOnError is an example WithOnError strategy that ignores
+// ContinueOnError is an example [WithOnError] strategy that ignores
 // the error and allows the leadership election to proceed.
 func ContinueOnError(_ error) error {
 	return nil
@@ -69,7 +69,7 @@ type mysqlLeader struct {
 	onError    func(error) error
 }
 
-// NewMysqlLeader provides an implementation of the Leader interface using
+// NewMysqlLeader provides an implementation of the [Leader] interface using
 // MySQL as the point of coordination between nodes. It is not a perfect
 // leadership election implementation but should be good enough providing
 // that tasks that require leadership election do not run for longer than

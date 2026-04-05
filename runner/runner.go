@@ -35,16 +35,16 @@ func WithLogger(logger quiet.Logger) Opt {
 	}
 }
 
-// WithSignals overrides the default SIGINT and SIGTERM shutdown signals.
+// WithSignals overrides the default [syscall.SIGINT] and [syscall.SIGTERM] shutdown signals.
 func WithSignals(signals ...os.Signal) Opt {
 	return func(cfg *cfgOpt) {
 		cfg.signals = signals
 	}
 }
 
-// Runner will kick off all runner functions passed to the Run function.
-// It will invoke all registered cleanup functions when any of the runners
-// terminates or when an exit signal (e.g. SIGINT or SIGTERM) is received.
+// Runner will kick off all runner functions passed to the [Runner.Run] function.
+// It will invoke all registered cleanup functions when any of the runners terminates
+// or when an exit signal (i.e. [syscall.SIGINT] or [syscall.SIGTERM]) is received.
 type Runner struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
@@ -115,8 +115,8 @@ func (r *Runner) Run(fn func() error) {
 	})
 }
 
-// Wait for the runners to terminate. Kick off the registered cleanup functions when
-// any runner terminates or when an exit signal (e.g. SIGINT or SIGTERM) is received.
+// Wait for the runners to terminate. Kick off the registered cleanup functions when any runner
+// terminates or when an exit signal (i.e. [syscall.SIGINT] or [syscall.SIGTERM]) is received.
 func (r *Runner) Wait() error {
 	r.group.Go(func() error {
 		sigint := make(chan os.Signal, 1)
