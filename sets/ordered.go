@@ -7,11 +7,11 @@ import (
 
 // Set type for encoding to & decoding from JSON.
 // Uses ordered keys to allow us to have stable JSON output.
-type Set[K cmp.Ordered] map[K]struct{}
+type Set[K cmp.Ordered] map[K]bool
 
 // New set creation from keys.
 func New[K cmp.Ordered](keys ...K) Set[K] {
-	return NewSetWithValue(struct{}{}, keys...)
+	return NewSet(keys...)
 }
 
 // MarshalJSON implements json.Marshaler
