@@ -22,12 +22,12 @@ type Collector struct {
 // enforce interface implementation
 var _ Logger = (*Collector)(nil)
 
-// Error appends the error to the [Collector.Errors] slice.
+// Error appends the error to the [Collector] Errors slice.
 func (c *Collector) Error(err error) {
 	c.Errors = append(c.Errors, err)
 }
 
-// Panic appends the panic to the [Collector.Panics] slice.
+// Panic appends the panic to the [Collector] Panics slice.
 func (c *Collector) Panic(p any) {
 	c.Panics = append(c.Panics, p)
 }
