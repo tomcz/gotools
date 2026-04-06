@@ -2,102 +2,76 @@ package errgroup
 
 import (
 	"context"
-	"fmt"
-	"runtime/debug"
 
 	"golang.org/x/sync/errgroup"
 )
 
-// Group provides an interface compatible with [golang.org/x/sync/errgroup.Group].
-type Group interface {
-	Go(f func() error)
-	TryGo(f func() error) bool
-	SetLimit(n int)
-	Wait() error
+// PanicGroup provides a panic handling wrapper around [golang.org/x/sync/errgroup.Group]
+// to avoid application crashes when a goroutine encounters a panic.
+type PanicGroup struct {
+	group   *errgroup.Group
+	handler PanicHandler
 }
 
-var _ Group = (*errgroup.Group)(nil)
-var _ Group = (*panicGroup)(nil)
-
-// PanicHandler processes the recovered panic.
-type PanicHandler func(p any) error
-
-// Opt is a configuration option.
-type Opt func(g *panicGroup)
-
-type panicGroup struct {
-	group  *errgroup.Group
-	handle PanicHandler
-}
-
-// WithPanicHandler overrides the default panic handler.
-func WithPanicHandler(ph PanicHandler) Opt {
-	return func(p *panicGroup) {
-		p.handle = ph
+// New creates a [PanicGroup] without any context cancellation.
+func New() *PanicGroup {
+	return &PanicGroup{
+		group:   &errgroup.Group{},
+		handler: defaultPanicHandler{},
 	}
 }
 
-// New creates a panic-handling [Group] without any context cancellation.
-func New(opts ...Opt) Group {
-	group := &errgroup.Group{}
-	pg := &panicGroup{group: group}
-	pg.configure(opts)
-	return pg
-}
-
-// NewContext creates a panic-handling [Group].
-// The returned context is cancelled on first error,
-// first panic, or when the Wait function exits.
-func NewContext(ctx context.Context, opts ...Opt) (Group, context.Context) {
+// NewContext creates a [PanicGroup] with context cancellation.
+// The returned context is cancelled on first error, first panic,
+// or when the Wait function exits.
+func NewContext(ctx context.Context) (*PanicGroup, context.Context) {
 	group, ctx := errgroup.WithContext(ctx)
-	pg := &panicGroup{group: group}
-	pg.configure(opts)
+	pg := &PanicGroup{group: group, handler: defaultPanicHandler{}}
 	return pg, ctx
 }
 
-func (pg *panicGroup) configure(opts []Opt) {
-	for _, opt := range opts {
-		opt(pg)
-	}
-	if pg.handle == nil {
-		pg.handle = defaultPanicHandler
+// SetPanicHandler to provide a custom [PanicHandler] if you need to perform
+// your own panic processing (e.g. send a notification to a tracking service).
+func (g *PanicGroup) SetPanicHandler(handler PanicHandler) {
+	if handler != nil {
+		g.handler = handler
+	} else {
+		g.handler = defaultPanicHandler{}
 	}
 }
 
-func (pg *panicGroup) Go(f func() error) {
-	pg.group.Go(func() (err error) {
+// Go delegates to [golang.org/x/sync/errgroup.Group.Go]
+// and deals with any recovered panics using a [PanicHandler].
+func (g *PanicGroup) Go(f func() error) {
+	g.group.Go(func() (err error) {
 		defer func() {
 			if p := recover(); p != nil {
-				err = pg.handle(p)
+				err = g.handler.Panic(p)
 			}
 		}()
 		return f()
 	})
 }
 
-func (pg *panicGroup) TryGo(f func() error) bool {
-	return pg.group.TryGo(func() (err error) {
+// TryGo delegates to [golang.org/x/sync/errgroup.Group.TryGo]
+// and deals with any recovered panics using a [PanicHandler].
+func (g *PanicGroup) TryGo(f func() error) bool {
+	return g.group.TryGo(func() (err error) {
 		defer func() {
 			if p := recover(); p != nil {
-				err = pg.handle(p)
+				err = g.handler.Panic(p)
 			}
 		}()
 		return f()
 	})
 }
 
-func (pg *panicGroup) SetLimit(n int) {
-	pg.group.SetLimit(n)
+// SetLimit delegates to [golang.org/x/sync/errgroup.Group.SetLimit].
+func (g *PanicGroup) SetLimit(n int) {
+	g.group.SetLimit(n)
 }
 
-func (pg *panicGroup) Wait() error {
-	return pg.group.Wait()
-}
-
-func defaultPanicHandler(p any) error {
-	stack := string(debug.Stack())
-	if err, ok := p.(error); ok {
-		return fmt.Errorf("panic: %w\nstack: %s", err, stack)
-	}
-	return fmt.Errorf("panic: %+v\nstack: %s", p, stack)
+// Wait delegates to [golang.org/x/sync/errgroup.Group.Wait].
+func (g *PanicGroup) Wait() error {
+	return g.group.Wait()
 }

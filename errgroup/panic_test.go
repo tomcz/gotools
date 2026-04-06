@@ -32,14 +32,14 @@ func TestGroup_Error(t *testing.T) {
 func TestGroup_Panic(t *testing.T) {
 	group, ctx := NewContext(context.Background())
 	group.Go(func() error {
-		panic("doh")
+		panic("d'oh")
 	})
 	group.Go(func() error {
 		<-ctx.Done()
 		return ctx.Err()
 	})
 	err := group.Wait()
-	assert.ErrorContains(t, err, "panic: doh")
+	assert.ErrorContains(t, err, "panic: d'oh")
 }
 
 func TestGroup_Panic_Error(t *testing.T) {
@@ -56,13 +56,17 @@ func TestGroup_Panic_Error(t *testing.T) {
 	assert.ErrorIs(t, err, cause)
 }
 
+type testPanicHandler struct{}
+
+func (h testPanicHandler) Panic(p any) error {
+	return fmt.Errorf("%v crap", p)
+}
+
 func TestGroup_Panic_Handler(t *testing.T) {
-	ph := func(p any) error {
-		return fmt.Errorf("%v handled", p)
-	}
-	group := New(WithPanicHandler(ph))
+	group := New()
+	group.SetPanicHandler(testPanicHandler{})
 	group.Go(func() error {
-		panic("mischief")
+		panic("d'oh")
 	})
-	assert.Error(t, group.Wait(), "mischief handled")
+	assert.Error(t, group.Wait(), "d'oh crap")
 }
