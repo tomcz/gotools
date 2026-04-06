@@ -48,7 +48,7 @@ func WithSignals(signals ...os.Signal) Opt {
 type Runner struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
-	group   errgroup.Group
+	group   *errgroup.PanicGroup
 	closer  *quiet.Closer
 	signals []os.Signal
 }
@@ -62,15 +62,14 @@ func New(opts ...Opt) *Runner {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	var handlerOpts []errgroup.Opt
+	group := errgroup.New()
 	if cfg.handler != nil {
-		handlerOpts = append(handlerOpts, errgroup.WithPanicHandler(cfg.handler))
+		group.SetPanicHandler(cfg.handler)
 	}
-	group := errgroup.New(handlerOpts...)
 
 	closer := &quiet.Closer{}
 	if cfg.logger != nil {
-		closer.Logger(cfg.logger)
+		closer.SetLogger(cfg.logger)
 	}
 
 	signals := []os.Signal{syscall.SIGINT, syscall.SIGTERM}
