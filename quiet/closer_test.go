@@ -47,7 +47,7 @@ func TestCloserLogger(t *testing.T) {
 	logger := &Collector{}
 
 	closer := &Closer{}
-	closer.Logger(logger)
+	closer.SetLogger(logger)
 
 	testPanic := errors.New("test panic")
 	closer.AddFunc(func() { panic(testPanic) })

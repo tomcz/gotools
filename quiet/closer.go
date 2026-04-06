@@ -15,9 +15,9 @@ type Closer struct {
 // enforce interface implementation
 var _ io.Closer = (*Closer)(nil)
 
-// Logger sets a panic & error logger for this closer.
+// SetLogger sets a custom logger for this closer.
 // By default, all errors and panics are ignored.
-func (c *Closer) Logger(logger Logger) {
+func (c *Closer) SetLogger(logger Logger) {
 	c.logger = logger
 }
 
