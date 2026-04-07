@@ -56,7 +56,15 @@ func GetInt64(envName string, defaultValue int64) int64 {
 
 // GetUint from an environment variable or the default value if not present or not a uint.
 func GetUint(envName string, defaultValue uint) uint {
-	return uint(GetUint64(envName, uint64(defaultValue)))
+	value := os.Getenv(envName)
+	if value == "" {
+		return defaultValue
+	}
+	res, err := strconv.ParseUint(value, 10, 0)
+	if err != nil {
+		return defaultValue
+	}
+	return uint(res)
 }
 
 // GetUint64 from an environment variable or the default value if not present or not a uint64.
