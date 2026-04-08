@@ -115,6 +115,9 @@ func createRootCA() error {
 
 var splitter = regexp.MustCompile(`[,\s]+`)
 
+// From https://regex-snippets.com/domain
+var domainName = regexp.MustCompile(`^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`)
+
 func createCert() error {
 	commonName := "DevCert"
 	country := "AU"
@@ -163,6 +166,9 @@ func createCert() error {
 	if dnsNamesTxt != "" {
 		for _, name := range splitter.Split(dnsNamesTxt, -1) {
 			if name != "" {
+				if !domainName.MatchString(name) {
+					return fmt.Errorf("%q is not a valid Domain Name", name)
+				}
 				dnsNames = append(dnsNames, name)
 			}
 		}
