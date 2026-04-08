@@ -14,24 +14,24 @@ import (
 	"math/big"
 	"net"
 	"os"
+	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"charm.land/huh/v2"
 )
 
 func main() {
-	var certType string
-	err := huh.NewSelect[string]().
+	var rootCA bool
+	err := huh.NewSelect[bool]().
 		Title("Certificate type?").
-		Options(huh.NewOption("Dev Root CA", "root"), huh.NewOption("TLS Certificate", "cert")).
-		Value(&certType).
+		Options(huh.NewOption("Dev Root CA", true), huh.NewOption("TLS Certificate", false)).
+		Value(&rootCA).
 		Run()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if certType == "root" {
+	if rootCA {
 		err = createRootCA()
 	} else {
 		err = createCert()
@@ -49,10 +49,10 @@ func createRootCA() error {
 	province := "Queensland"
 	streetAddress := "Adelaide Street"
 	postalCode := "4000"
-	keyType := "ec"
 	certFilePath := "devca.crt"
 	keyFilePath := "devca.key"
 	certDaysTxt := "3650"
+	var rsaKey bool
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -64,7 +64,7 @@ func createRootCA() error {
 			huh.NewInput().Title("Street Address?").Value(&streetAddress).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Postal Code?").Value(&postalCode).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Certficate lifetime (in days)?").Value(&certDaysTxt).Validate(validPositiveInt),
-			huh.NewSelect[string]().Title("Private key type?").Options(huh.NewOption("EC", "ec"), huh.NewOption("RSA", "rsa")).Value(&keyType),
+			huh.NewSelect[bool]().Title("Private key type?").Options(huh.NewOption("EC", false), huh.NewOption("RSA", true)).Value(&rsaKey),
 			huh.NewInput().Title("Certificate file path?").Value(&certFilePath).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Private key file path?").Value(&keyFilePath).Validate(huh.ValidateNotEmpty()),
 		),
@@ -96,22 +96,24 @@ func createRootCA() error {
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
-	privKey, err := newPrivateKey(keyType)
+	privKey, err := newPrivateKey(rsaKey)
 	if err != nil {
 		return err
 	}
-	certBytes, err := x509.CreateCertificate(rand.Reader, cert, cert, publicKeyFor(keyType, privKey), privKey)
+	certBytes, err := x509.CreateCertificate(rand.Reader, cert, cert, publicKeyFor(privKey), privKey)
 	if err != nil {
 		return err
 	}
 	if err = writeCertificate(certBytes, certFilePath); err != nil {
 		return err
 	}
-	if err = writePrivateKey(keyType, privKey, keyFilePath); err != nil {
+	if err = writePrivateKey(privKey, keyFilePath); err != nil {
 		return err
 	}
 	return nil
 }
+
+var splitter = regexp.MustCompile(`[,\s]+`)
 
 func createCert() error {
 	commonName := "DevCert"
@@ -121,7 +123,6 @@ func createCert() error {
 	province := "Queensland"
 	streetAddress := "Adelaide Street"
 	postalCode := "4000"
-	keyType := "ec"
 	certFilePath := "dev.crt"
 	keyFilePath := "dev.key"
 	caCertFilePath := "devca.crt"
@@ -129,6 +130,7 @@ func createCert() error {
 	certDaysTxt := "365"
 	var dnsNamesTxt string
 	var ipAddrsTxt string
+	var rsaKey bool
 
 	form := huh.NewForm(
 		huh.NewGroup(
@@ -139,10 +141,10 @@ func createCert() error {
 			huh.NewInput().Title("Province?").Value(&province).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Street Address?").Value(&streetAddress).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Postal Code?").Value(&postalCode).Validate(huh.ValidateNotEmpty()),
-			huh.NewInput().Title("Certficate lifetime (in days):").Value(&certDaysTxt).Validate(validPositiveInt),
-			huh.NewSelect[string]().Title("Private key type?").Options(huh.NewOption("EC", "ec"), huh.NewOption("RSA", "rsa")).Value(&keyType),
-			huh.NewInput().Title("DNS SANs (comma-separated):").Value(&dnsNamesTxt),
-			huh.NewInput().Title("IP SANs (comma-separated):").Value(&ipAddrsTxt),
+			huh.NewInput().Title("Certficate lifetime (in days)?").Value(&certDaysTxt).Validate(validPositiveInt),
+			huh.NewSelect[bool]().Title("Private key type?").Options(huh.NewOption("EC", false), huh.NewOption("RSA", true)).Value(&rsaKey),
+			huh.NewInput().Title("DNS SANs (optional)?").Value(&dnsNamesTxt),
+			huh.NewInput().Title("IP SANs (optional)?").Value(&ipAddrsTxt),
 			huh.NewInput().Title("Certificate file path?").Value(&certFilePath).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Private key file path?").Value(&keyFilePath).Validate(huh.ValidateNotEmpty()),
 			huh.NewInput().Title("Root certificate file path?").Value(&caCertFilePath).Validate(huh.ValidateNotEmpty()),
@@ -159,8 +161,7 @@ func createCert() error {
 	}
 	var dnsNames []string
 	if dnsNamesTxt != "" {
-		for _, name := range strings.Split(dnsNamesTxt, ",") {
-			name = strings.TrimSpace(name)
+		for _, name := range splitter.Split(dnsNamesTxt, -1) {
 			if name != "" {
 				dnsNames = append(dnsNames, name)
 			}
@@ -168,12 +169,11 @@ func createCert() error {
 	}
 	var ipAddrs []net.IP
 	if ipAddrsTxt != "" {
-		for _, value := range strings.Split(ipAddrsTxt, ",") {
-			value = strings.TrimSpace(value)
+		for _, value := range splitter.Split(ipAddrsTxt, -1) {
 			if value != "" {
 				ip := net.ParseIP(value)
 				if ip == nil {
-					return fmt.Errorf("invalid IP address: %s", value)
+					return fmt.Errorf("%q is not an IP address", value)
 				}
 				ipAddrs = append(ipAddrs, ip)
 			}
@@ -207,18 +207,18 @@ func createCert() error {
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:    x509.KeyUsageDigitalSignature,
 	}
-	privKey, err := newPrivateKey(keyType)
+	privKey, err := newPrivateKey(rsaKey)
 	if err != nil {
 		return err
 	}
-	certBytes, err := x509.CreateCertificate(rand.Reader, cert, caCert, publicKeyFor(keyType, privKey), caKey)
+	certBytes, err := x509.CreateCertificate(rand.Reader, cert, caCert, publicKeyFor(privKey), caKey)
 	if err != nil {
 		return err
 	}
 	if err = writeCertificate(certBytes, certFilePath); err != nil {
 		return err
 	}
-	if err = writePrivateKey(keyType, privKey, keyFilePath); err != nil {
+	if err = writePrivateKey(privKey, keyFilePath); err != nil {
 		return err
 	}
 	return nil
@@ -235,18 +235,17 @@ func validPositiveInt(s string) error {
 	return nil
 }
 
-func newPrivateKey(keyType string) (any, error) {
-	if keyType == "ec" {
-		priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-		return priv, err
+func newPrivateKey(rsaKey bool) (any, error) {
+	if rsaKey {
+		log.Println("Generating RSA private key")
+		return rsa.GenerateKey(rand.Reader, 4096)
 	}
-	priv, err := rsa.GenerateKey(rand.Reader, 4096)
-	return priv, err
+	log.Println("Generating EC private key")
+	return ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 }
 
-func publicKeyFor(keyType string, privKey any) any {
-	if keyType == "ec" {
-		pk := privKey.(*ecdsa.PrivateKey)
+func publicKeyFor(privKey any) any {
+	if pk, ok := privKey.(*ecdsa.PrivateKey); ok {
 		return &pk.PublicKey
 	}
 	pk := privKey.(*rsa.PrivateKey)
@@ -284,7 +283,7 @@ func readCertificate(certFile string) (*x509.Certificate, error) {
 	}
 }
 
-func writePrivateKey(keyType string, privKey any, outfile string) error {
+func writePrivateKey(privKey any, outfile string) error {
 	log.Println("Writing to", outfile)
 	fp, err := os.Create(outfile)
 	if err != nil {
@@ -292,8 +291,7 @@ func writePrivateKey(keyType string, privKey any, outfile string) error {
 	}
 	defer fp.Close()
 
-	if keyType != "ec" {
-		pk := privKey.(*rsa.PrivateKey)
+	if pk, ok := privKey.(*rsa.PrivateKey); ok {
 		return pem.Encode(fp, &pem.Block{
 			Type:  "RSA PRIVATE KEY",
 			Bytes: x509.MarshalPKCS1PrivateKey(pk),
@@ -312,9 +310,9 @@ func writePrivateKey(keyType string, privKey any, outfile string) error {
 }
 
 func readPrivateKey(keyFile string) (any, error) {
-	buf, fail := os.ReadFile(keyFile)
-	if fail != nil {
-		return nil, fail
+	buf, err := os.ReadFile(keyFile)
+	if err != nil {
+		return nil, err
 	}
 	for {
 		var block *pem.Block
