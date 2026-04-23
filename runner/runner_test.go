@@ -13,7 +13,7 @@ func TestRunner(t *testing.T) {
 	var lock sync.Mutex
 	var order []string
 
-	app := New()
+	app := New(WithAsyncCleanup())
 	app.Run(func() error {
 		lock.Lock()
 		order = append(order, "run")

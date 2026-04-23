@@ -16,6 +16,7 @@ type cfgOpt struct {
 	handler errgroup.PanicHandler
 	logger  quiet.Logger
 	signals []os.Signal
+	async   bool
 }
 
 // Opt is a Runner configuration option.
@@ -42,6 +43,14 @@ func WithSignals(signals ...os.Signal) Opt {
 	}
 }
 
+// WithAsyncCleanup will run the registered cleanup functions in parallel rather than the default
+// inverse order of registration that mimics the invocation order of defers in a function.
+func WithAsyncCleanup() Opt {
+	return func(cfg *cfgOpt) {
+		cfg.async = true
+	}
+}
+
 // Runner will kick off all runner functions passed to the [Runner.Run] function.
 // It will invoke all registered cleanup functions when any of the runners terminates
 // or when an exit signal (i.e. [syscall.SIGINT] or [syscall.SIGTERM]) is received.
@@ -51,6 +60,7 @@ type Runner struct {
 	group   *errgroup.PanicGroup
 	closer  *quiet.Closer
 	signals []os.Signal
+	async   bool
 }
 
 // New constructor.
@@ -83,6 +93,7 @@ func New(opts ...Opt) *Runner {
 		group:   group,
 		closer:  closer,
 		signals: signals,
+		async:   cfg.async,
 	}
 }
 
@@ -122,10 +133,19 @@ func (r *Runner) Wait() error {
 		signal.Notify(sigint, r.signals...)
 		select {
 		case <-sigint:
-			return r.closer.Close()
+			return r.cleanup()
 		case <-r.ctx.Done():
-			return r.closer.Close()
+			return r.cleanup()
 		}
 	})
 	return r.group.Wait()
+}
+
+func (r *Runner) cleanup() error {
+	if r.async {
+		r.closer.CloseAsync()
+	} else {
+		r.closer.CloseAll()
+	}
+	return nil
 }

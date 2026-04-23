@@ -3,6 +3,7 @@ package quiet
 import (
 	"context"
 	"io"
+	"sync"
 	"time"
 )
 
@@ -50,6 +51,25 @@ func (c *Closer) CloseAll() {
 	for i := len(c.closers) - 1; i >= 0; i-- {
 		c.close(c.closers[i])
 	}
+}
+
+// CloseAsync will attempt to call the closers in parallel.
+// This is useful in speeding up an application's shutdown
+// but does not guarantee an invocation order for closers.
+func (c *Closer) CloseAsync() {
+	if c.logger == nil {
+		c.logger = noopLogger{}
+	}
+	var wg sync.WaitGroup
+	wg.Add(len(c.closers))
+	for i := len(c.closers) - 1; i >= 0; i-- {
+		closer := c.closers[i]
+		go func() {
+			defer wg.Done()
+			c.close(closer)
+		}()
+	}
+	wg.Wait()
 }
 
 // Close for [io.Closer] compatibility.
