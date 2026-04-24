@@ -17,10 +17,17 @@ import (
 // This handler will use [libhoney.NewEvent] to create events if a [libhoney.Builder]
 // has not been provided.
 //
+// Reject is an optional filter for log records that should not be sent as events.
+// The default behaviour is to forward all records that are enabled for each record's
+// log level. This can be further extended by providing a filter that can perform
+// additional inspection of records and returns true if the record should not be
+// sent as an event.
+//
 // [honeycomb.io]: https://www.honeycomb.io
 type Handler struct {
-	Level   slog.Level        // Optional
-	Builder *libhoney.Builder // Optional
+	Level   slog.Level             // Optional
+	Builder *libhoney.Builder      // Optional
+	Reject  func(slog.Record) bool // Optional
 	attrs   map[string]slog.Value
 	groups  []string
 }
@@ -33,6 +40,9 @@ func (h *Handler) Enabled(_ context.Context, level slog.Level) bool {
 
 func (h *Handler) Handle(ctx context.Context, record slog.Record) error {
 	if !h.Enabled(ctx, record.Level) {
+		return nil
+	}
+	if h.Reject != nil && h.Reject(record) {
 		return nil
 	}
 	params := make(map[string]any)
