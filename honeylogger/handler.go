@@ -97,12 +97,7 @@ func (h *Handler) WithAttrs(attrs []slog.Attr) slog.Handler {
 	if len(h.groups) > 0 {
 		newGroups = slices.Clone(h.groups)
 	}
-	return &Handler{
-		Level:   h.Level,
-		Builder: h.Builder,
-		attrs:   newAttrs,
-		groups:  newGroups,
-	}
+	return h.copy(newAttrs, newGroups)
 }
 
 func (h *Handler) WithGroup(name string) slog.Handler {
@@ -114,11 +109,16 @@ func (h *Handler) WithGroup(name string) slog.Handler {
 	if len(h.groups) > 0 {
 		newGroups = slices.Concat(h.groups, newGroups)
 	}
+	return h.copy(newAttrs, newGroups)
+}
+
+func (h *Handler) copy(attrs map[string]slog.Value, groups []string) *Handler {
 	return &Handler{
 		Level:   h.Level,
 		Builder: h.Builder,
-		attrs:   newAttrs,
-		groups:  newGroups,
+		Reject:  h.Reject,
+		attrs:   attrs,
+		groups:  groups,
 	}
 }
 
