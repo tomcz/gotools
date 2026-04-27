@@ -19,7 +19,7 @@ func TestReloader_Compatibility(t *testing.T) {
 }
 
 func TestReloader_GetCertificate(t *testing.T) {
-	reloader, err := New(t.Context(), "testdata/dev.crt", "testdata/dev.key", time.Hour)
+	reloader, err := New(t.Context(), "testdata/dev.crt", "testdata/dev.key")
 	assert.NilError(t, err)
 	cert, err := reloader.GetCertificate(nil)
 	assert.NilError(t, err)
@@ -27,7 +27,7 @@ func TestReloader_GetCertificate(t *testing.T) {
 }
 
 func TestReloader_GetClientCertificate(t *testing.T) {
-	reloader, err := New(t.Context(), "testdata/dev.crt", "testdata/dev.key", time.Hour)
+	reloader, err := New(t.Context(), "testdata/dev.crt", "testdata/dev.key")
 	assert.NilError(t, err)
 	cert, err := reloader.GetClientCertificate(nil)
 	assert.NilError(t, err)

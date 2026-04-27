@@ -9,6 +9,28 @@ import (
 	"time"
 )
 
+// Opt type for reloader configuration options.
+type Opt func(r *Reloader)
+
+// WithReloadInterval overrides the default reload interval. However,
+// it will not allow you to set an interval less than the minimum of one hour.
+func WithReloadInterval(interval time.Duration) Opt {
+	return func(r *Reloader) {
+		r.interval = max(interval, time.Hour)
+	}
+}
+
+// WithLogger overrides the default logger created with a [slog.DiscardHandler].
+// The logger is used to record errors found during the background certificate
+// reload at warn level, and successful certificate load events at debug level.
+func WithLogger(logger *slog.Logger) Opt {
+	return func(r *Reloader) {
+		if logger != nil {
+			r.log = logger
+		}
+	}
+}
+
 // Reloader for [tls.Config] certificate and private key files.
 type Reloader struct {
 	certFile string
@@ -21,12 +43,15 @@ type Reloader struct {
 // New creates a new [Reloader] that will use a background goroutine to
 // periodically reload the given certificate and private key files.
 // The goroutine will keep on running until the given context is done.
-func New(ctx context.Context, certificateFile string, privateKeyFile string, reloadInterval time.Duration) (*Reloader, error) {
+func New(ctx context.Context, certificateFile string, privateKeyFile string, opts ...Opt) (*Reloader, error) {
 	reloader := &Reloader{
 		certFile: certificateFile,
 		keyFile:  privateKeyFile,
-		interval: reloadInterval,
+		interval: time.Hour,
 		log:      slog.New(slog.DiscardHandler),
+	}
+	for _, opt := range opts {
+		opt(reloader)
 	}
 	err := reloader.loadCertificate()
 	if err != nil {
@@ -34,13 +59,6 @@ func New(ctx context.Context, certificateFile string, privateKeyFile string, rel
 	}
 	go reloader.reloadCertificate(ctx)
 	return reloader, nil
-}
-
-// SetLogger overrides the default logger created with a [slog.DiscardHandler].
-// The logger is used to record errors found during the background certificate
-// reload at warn level, and successful certificate load events at debug level.
-func (r *Reloader) SetLogger(log *slog.Logger) {
-	r.log = log
 }
 
 // GetCertificate returns the managed TLS certificate to be used for server authentication.
