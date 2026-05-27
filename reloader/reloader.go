@@ -82,8 +82,8 @@ func (r *Reloader) loadCertificate() error {
 	if err != nil {
 		return err
 	}
-	r.log.Debug("loadCertificate successful")
 	r.value.Store(&cert)
+	r.log.Debug("loadCertificate successful")
 	return nil
 }
 
