@@ -96,7 +96,7 @@ func (r *Reloader) reloadCertificate(ctx context.Context) {
 			return
 		case <-ticker.C:
 			if err := r.loadCertificate(); err != nil {
-				r.log.Warn("loadCertificate", "err", err)
+				r.log.Warn("loadCertificate failed", "err", err)
 			}
 		}
 	}
