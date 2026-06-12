@@ -6,9 +6,11 @@ import (
 	"slices"
 )
 
-// NewSet creates a new set using "true" as the map value.
-func NewSet[K comparable](keys ...K) map[K]bool {
-	return NewSetWithValue(true, keys...)
+var empty = struct{}{}
+
+// NewSet creates a new set using an empty struct as the map value.
+func NewSet[K comparable](keys ...K) map[K]struct{} {
+	return NewSetWithValue(empty, keys...)
 }
 
 // NewSetWithValue creates a set with each key given the same value.
@@ -64,11 +66,11 @@ func SubsetOf[K comparable, V any](this, other map[K]V) bool {
 	return true
 }
 
-// Add all given keys to this set using "true" as the map value.
+// Add all given keys to this set using an empty struct as the map value.
 //
 // Useful for sets created by [New] and [NewSet].
-func Add[K comparable](this map[K]bool, keys ...K) {
-	AddWithValue(this, true, keys...)
+func Add[K comparable](this map[K]struct{}, keys ...K) {
+	AddWithValue(this, empty, keys...)
 }
 
 // AddWithValue adds multiple keys to this set, each with the same value.

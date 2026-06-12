@@ -6,8 +6,9 @@ import (
 )
 
 // Set type for encoding to & decoding from JSON.
-// Uses [cmp.Ordered] keys to allow us to have stable JSON output.
-type Set[K cmp.Ordered] map[K]bool
+//
+// Uses [cmp.Ordered] keys to have predictable JSON output.
+type Set[K cmp.Ordered] map[K]struct{}
 
 // New creates an ordered set using [NewSet].
 func New[K cmp.Ordered](keys ...K) Set[K] {
