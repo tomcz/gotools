@@ -2,6 +2,11 @@ package errgroup
 
 import "sync"
 
+// Collect is a wrapper for the default behaviour of [Collector.Collect].
+func Collect(funcs ...func() error) []error {
+	return new(Collector).Collect(funcs...)
+}
+
 // Collector of errors.
 type Collector struct {
 	// Optional. The default handler will be used if this is nil.

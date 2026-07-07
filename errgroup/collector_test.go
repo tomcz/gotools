@@ -26,8 +26,7 @@ func TestCollect(t *testing.T) {
 }
 
 func TestCollect_Default(t *testing.T) {
-	collector := &Collector{}
-	res := collector.Collect(
+	res := Collect(
 		func() error { return nil },
 		func() error { return errors.New("wibble") },
 		func() error { panic("d'oh") },
