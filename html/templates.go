@@ -1,7 +1,6 @@
 package html
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -9,9 +8,6 @@ import (
 	"strings"
 	"sync"
 )
-
-// ErrWrite when unable to write the template to the output writer.
-var ErrWrite = errors.New("write error")
 
 // Templates renders HTML templates from a filesystem with optional template caching.
 // Caching of templates is very useful when using embedded filesystems or when the files
@@ -37,7 +33,6 @@ type renderCfg struct {
 	layoutFile    string
 	templateName  string
 	templateFiles []string
-	unbuffered    bool
 }
 
 type RenderOpt func(cfg *renderCfg)
@@ -68,22 +63,9 @@ func WithTemplateFiles(files ...string) RenderOpt {
 	}
 }
 
-// WithoutBuffer disables buffering of template execution.
-// We buffer template execution output by default to avoid writing incomplete
-// or malformed content to the response, but sometimes huge data sets are
-// best rendered without any intermediate buffering.
-func WithoutBuffer() RenderOpt {
-	return func(cfg *renderCfg) {
-		cfg.unbuffered = true
-	}
-}
-
 // Render a template to a [io.Writer]. Template files generally have a common layout
 // file ("layout.gohtml") with a common "main" template that renders the given template
 // file within the context of the layout to produce well-structrured HTML output.
-//
-// Callers can use [ErrWrite] to distinguish between template preparation, execution, and
-// output errors as this error is only returned when writing to the output writer has failed.
 func (t *Templates) Render(w io.Writer, templateFile string, data map[string]any, opts ...RenderOpt) error {
 	cfg := &renderCfg{
 		layoutFile:   "layout.gohtml",
@@ -99,10 +81,7 @@ func (t *Templates) Render(w io.Writer, templateFile string, data map[string]any
 	if err != nil {
 		return err
 	}
-	if cfg.unbuffered {
-		return writeUnbuffered(w, cfg, tmpl, data)
-	}
-	return writeBuffered(w, cfg, tmpl, data)
+	return tmpl.ExecuteTemplate(w, cfg.templateName, data)
 }
 
 func (t *Templates) newTemplate(cfg *renderCfg, templateFile string) (*template.Template, error) {
@@ -152,28 +131,4 @@ func (t *Templates) readTemplate(path string) ([]byte, error) {
 		return nil, fmt.Errorf("%s read failed: %w", path, err)
 	}
 	return buf, nil
-}
-
-func writeUnbuffered(w io.Writer, cfg *renderCfg, tmpl *template.Template, data map[string]any) error {
-	err := tmpl.ExecuteTemplate(w, cfg.templateName, data)
-	if err != nil {
-		return fmt.Errorf("unbuffered %w: %w", ErrWrite, err)
-	}
-	return nil
-}
-
-func writeBuffered(w io.Writer, cfg *renderCfg, tmpl *template.Template, data map[string]any) error {
-	buf := bufBorrow()
-	defer bufReturn(buf)
-
-	err := tmpl.ExecuteTemplate(buf, cfg.templateName, data)
-	if err != nil {
-		return fmt.Errorf("template execute: %w", err)
-	}
-
-	_, err = buf.WriteTo(w)
-	if err != nil {
-		return fmt.Errorf("buffered %w: %w", ErrWrite, err)
-	}
-	return nil
 }
