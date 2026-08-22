@@ -49,7 +49,7 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t mysql:8.0                    \
+		-it docker.io/mysql:9           \
 		./scripts/wait-for-mysql.sh
 	@docker run --rm                    \
 		-e DB_HOST="database"           \
@@ -58,5 +58,5 @@ docker-run:
 		--network gotools_local         \
 		-v "${BASE_DIR}:/code"          \
 		-w /code                        \
-		-t golang:1.26                  \
+		-it docker.io/golang:1.26       \
 		make test

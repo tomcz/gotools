@@ -1,6 +1,6 @@
 services:
   database:
-    image: mysql:9
+    image: docker.io/mysql:9
     environment:
       MYSQL_ROOT_PASSWORD: sekret
     ports:
