@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// Pool implements a garbage-collection-friendly pool of output buffers backed by `sync.Pool`.
+// Pool implements a garbage-collection-friendly pool of output buffers backed by [sync.Pool].
 //
 // Each borrowed buffer must be returned back to the pool to allow reuse and prevent memory leaks.
 type Pool struct {

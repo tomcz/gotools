@@ -63,7 +63,7 @@ func WithTemplateFiles(files ...string) RenderOpt {
 	}
 }
 
-// Render a template to a [io.Writer]. Template files generally have a common layout
+// Render a template to an [io.Writer]. Template files generally have a common layout
 // file ("layout.gohtml") with a common "main" template that renders the given template
 // file within the context of the layout to produce well-structrured HTML output.
 func (t *Templates) Render(w io.Writer, templateFile string, data map[string]any, opts ...RenderOpt) error {
