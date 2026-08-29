@@ -1,6 +1,6 @@
 module github.com/tomcz/gotools
 
-go 1.26
+go 1.27
 
 require (
 	github.com/andybalholm/cascadia v1.3.4
