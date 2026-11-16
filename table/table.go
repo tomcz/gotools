@@ -100,6 +100,11 @@ func writeLine(sb *strings.Builder, colWidths []int, left, middle, right string)
 	sb.WriteString(right)
 }
 
+var (
+	boldStart = fmt.Sprintf("\u001b[%dm", 1)
+	boldEnd   = fmt.Sprintf("\u001b[%dm", 22)
+)
+
 func (t *Table) writeRow(sb *strings.Builder, row []tblCell, colWidths []int, bold bool) {
 	cells := make([][]string, len(row))
 	for i, cell := range row {
@@ -120,7 +125,7 @@ func (t *Table) writeRow(sb *strings.Builder, row []tblCell, colWidths []int, bo
 			if line < len(cell) {
 				text := runewidth.FillRight(cell[line], colWidths[i])
 				if bold {
-					text = boldText(text)
+					text = boldStart + text + boldEnd
 				}
 				sb.WriteString(text)
 			} else {
@@ -159,12 +164,6 @@ func (t *Table) wrapText(cell tblCell, width int) []string {
 		lines = append(lines, line)
 	}
 	return lines
-}
-
-func boldText(text string) string {
-	start := fmt.Sprintf("\u001b[%dm", 1)
-	stop := fmt.Sprintf("\u001b[%dm", 22)
-	return start + text + stop
 }
 
 type columnInfo struct {
