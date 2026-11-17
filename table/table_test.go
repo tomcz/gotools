@@ -9,19 +9,19 @@ import (
 
 const expected = `
 ┌───────────┬───────┬────────────┬────────────────┬────────────────┬────────────┬────────────────┐
-│ IP        │ ASN   │ AS Country │ AS Description │ Geo Country    │ Geo Region │ Geo City       │
+│    IP     │  ASN  │ AS Country │ AS Description │ Geo Country    │ Geo Region │ Geo City       │
 ├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 1.1.1.1   │ 13335 │ US         │ CLOUDFLARENET  │ Australia      │ Queensland │ Brisbane       │
+│ 1.1.1.1   │ 13335 │     US     │ CLOUDFLARENET  │ Australia      │ Queensland │ Brisbane       │
 │           │       │            │ - Cloudflare,  │                │            │                │
 │           │       │            │ Inc.           │                │            │                │
 ├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
 │ 2.2.2.2   │       │            │                │ United States  │ Virginia   │ Redwood        │
 │           │       │            │                │ of America     │            │                │
 ├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 8.8.8.8   │ 15169 │ US         │ GOOGLE -       │ United States  │ California │ Mountain View  │
+│ 8.8.8.8   │ 15169 │     US     │ GOOGLE -       │ United States  │ California │ Mountain View  │
 │           │       │            │ Google LLC     │ of America     │            │                │
 ├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 9.9.9.9   │ 19281 │ US         │ QUAD9-AS-1 -   │ United States  │ California │ Berkeley       │
+│ 9.9.9.9   │ 19281 │     US     │ QUAD9-AS-1 -   │ United States  │ California │ Berkeley       │
 │           │       │            │ Quad9          │ of America     │            │                │
 ├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
 │ 127.0.0.1 │       │            │                │                │            │                │
@@ -38,6 +38,9 @@ func TestTable(t *testing.T) {
 	assert.NilError(t, table.AddRow("9.9.9.9", "19281", "US", "QUAD9-AS-1 - Quad9", "United States of America", "California", "Berkeley"))
 	assert.NilError(t, table.AddRow("127.0.0.1", "", "", "", "", "", ""))
 
-	table.BoldHeader(false)
+	table.BoldHeaders(false)
+	table.Alignment(0, Middle, Left)
+	table.Alignment(1, Middle, Right)
+	table.Alignment(2, Middle, Middle)
 	assert.Equal(t, table.String(), strings.TrimSpace(expected))
 }

@@ -14,18 +14,18 @@ import (
 func main() {
 	var results []*Result // initialisation omitted
 	
-	boldHeader := true
+	boldHeaders := true
 	width, _, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {
 		// not running in a terminal, use fixed width and plain headers
-		boldHeader = false
+		boldHeaders = false
 		width = 100
 	}
 	tbl, err := table.NewTable(width, "IP", "ASN", "AS Country", "AS Description", "Geo Country", "Geo Region", "Geo City")
 	if err != nil {
 		log.Fatalln(err)
 	}
-	tbl.BoldHeader(boldHeader)
+	tbl.BoldHeaders(boldHeaders)
 	for _, res := range results {
 		row := make([]string, 7)
 		row[0] = res.IP
