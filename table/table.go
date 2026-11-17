@@ -1,9 +1,10 @@
 package table
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
-	"math"
+	sdk "slices"
 	"strings"
 
 	"github.com/mattn/go-runewidth"
@@ -252,14 +253,18 @@ func (t *Table) columnWidths() []int {
 		return columnWidths(columns)
 	}
 
-	fairWidth := int(math.Floor(float64(t.maxWidth-overhead) / float64(len(columns))))
-	longCols := slices.Select(columns, func(c *columnInfo) bool { return c.width > fairWidth })
-	shortCols := slices.Select(columns, func(c *columnInfo) bool { return c.width < fairWidth })
-	diff := slices.Reduce(shortCols, 0, func(acc int, c *columnInfo) int { return acc + (fairWidth - c.width) })
-	longWidth := fairWidth + int(math.Floor(float64(diff)/float64(len(longCols))))
+	equalWidth := (t.maxWidth - overhead) / len(columns)
+	wideCols := slices.Select(columns, func(c *columnInfo) bool { return c.width > equalWidth })
+	for _, col := range wideCols {
+		col.width = equalWidth
+	}
 
-	for _, col := range longCols {
-		col.width = longWidth
+	var col int
+	tableWidth = slices.Reduce(columns, overhead, func(acc int, c *columnInfo) int { return acc + c.width })
+	sdk.SortStableFunc(wideCols, func(a, b *columnInfo) int { return cmp.Compare(b.width, a.width) })
+	for i := t.maxWidth - tableWidth; i > 0; i-- {
+		wideCols[col].width += 1
+		col = maths.Choose(col < len(wideCols)-1, col+1, 0)
 	}
 	return columnWidths(columns)
 }
