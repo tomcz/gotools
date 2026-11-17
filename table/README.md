@@ -25,7 +25,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	tbl.BoldHeaders(boldHeaders)
 	for _, res := range results {
 		row := make([]string, 7)
 		row[0] = res.IP
@@ -39,31 +38,33 @@ func main() {
 			row[5] = res.Location.Region
 			row[6] = res.Location.City
 		}
-		if err = tbl.AddRow(row...); err != nil {
-			log.Fatalln(err)
-		}
+		tbl.AddRow(row...)
 	}
+	tbl.BoldHeaders(boldHeaders)
+	tbl.Alignment("IP", table.Middle, table.Left)
+	tbl.Alignment("ASN", table.Middle, table.Right)
+	tbl.Alignment("AS Country", table.Middle, table.Middle)
 	fmt.Println(tbl.String())
 }
 ```
 
 ```
-┌───────────┬───────┬────────────┬────────────────┬────────────────┬────────────┬────────────────┐
-│ IP        │ ASN   │ AS Country │ AS Description │ Geo Country    │ Geo Region │ Geo City       │
-├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 1.1.1.1   │ 13335 │ US         │ CLOUDFLARENET  │ Australia      │ Queensland │ Brisbane       │
-│           │       │            │ - Cloudflare,  │                │            │                │
-│           │       │            │ Inc.           │                │            │                │
-├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 2.2.2.2   │       │            │                │ United States  │ Virginia   │ Redwood        │
-│           │       │            │                │ of America     │            │                │
-├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 8.8.8.8   │ 15169 │ US         │ GOOGLE -       │ United States  │ California │ Mountain View  │
-│           │       │            │ Google LLC     │ of America     │            │                │
-├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 9.9.9.9   │ 19281 │ US         │ QUAD9-AS-1 -   │ United States  │ California │ Berkeley       │
-│           │       │            │ Quad9          │ of America     │            │                │
-├───────────┼───────┼────────────┼────────────────┼────────────────┼────────────┼────────────────┤
-│ 127.0.0.1 │       │            │                │                │            │                │
-└───────────┴───────┴────────────┴────────────────┴────────────────┴────────────┴────────────────┘
+┌───────────┬───────┬────────────┬─────────────────┬─────────────────┬────────────┬────────────────┐
+│    IP     │  ASN  │ AS Country │ AS Description  │ Geo Country     │ Geo Region │ Geo City       │
+├───────────┼───────┼────────────┼─────────────────┼─────────────────┼────────────┼────────────────┤
+│ 1.1.1.1   │ 13335 │     US     │ CLOUDFLARENET   │ Australia       │ Queensland │ Brisbane       │
+│           │       │            │ - Cloudflare,   │                 │            │                │
+│           │       │            │ Inc.            │                 │            │                │
+├───────────┼───────┼────────────┼─────────────────┼─────────────────┼────────────┼────────────────┤
+│ 2.2.2.2   │       │            │                 │ United States   │ Virginia   │ Redwood        │
+│           │       │            │                 │ of America      │            │                │
+├───────────┼───────┼────────────┼─────────────────┼─────────────────┼────────────┼────────────────┤
+│ 8.8.8.8   │ 15169 │     US     │ GOOGLE -        │ United States   │ California │ Mountain View  │
+│           │       │            │ Google LLC      │ of America      │            │                │
+├───────────┼───────┼────────────┼─────────────────┼─────────────────┼────────────┼────────────────┤
+│ 9.9.9.9   │ 19281 │     US     │ QUAD9-AS-1 -    │ United States   │ California │ Berkeley       │
+│           │       │            │ Quad9           │ of America      │            │                │
+├───────────┼───────┼────────────┼─────────────────┼─────────────────┼────────────┼────────────────┤
+│ 127.0.0.1 │       │            │                 │                 │            │                │
+└───────────┴───────┴────────────┴─────────────────┴─────────────────┴────────────┴────────────────┘
 ```
