@@ -59,19 +59,22 @@ type Table struct {
 	maxWidth    int
 }
 
-// NewTable constructor. Invalid maxWidth and empty headers result in errors.
+// NewTable constructor.
 func NewTable(maxWidth int, headers ...string) (*Table, error) {
-	if maxWidth < 1 {
-		return nil, fmt.Errorf("invalid maxWidth: %d", maxWidth)
-	}
 	if len(headers) == 0 {
 		return nil, errors.New("headers cannot be empty")
 	}
+	// minimum width is overhead + one character per header
+	minWidth := formatOverhead(len(headers)) + len(headers)
+	if maxWidth < minWidth {
+		return nil, fmt.Errorf("invalid maxWidth: %d, need at least %d", maxWidth, minWidth)
+	}
 	runes := make(runeWidths)
+	cells := tblCells(headers, runes)
 	return &Table{
 		boldHeaders: true,
 		maxWidth:    maxWidth,
-		headers:     tblCells(headers, runes),
+		headers:     cells,
 		runes:       runes,
 	}, nil
 }
@@ -82,13 +85,12 @@ func (t *Table) BoldHeaders(bold bool) {
 }
 
 // Alignment sets the alignment for an individual table column.
-// An error is returned if the headerText does not match a previously set header.
-func (t *Table) Alignment(headerText string, header Alignment, values Alignment) error {
+func (t *Table) Alignment(headerText string, header Alignment, values Alignment) {
 	column := slices.IndexOf(t.headers, func(cell tblCell) bool {
 		return cell.Value == headerText
 	})
 	if column < 0 {
-		return fmt.Errorf("unknown header %q", headerText)
+		panic(fmt.Sprintf("unknown header %q", headerText))
 	}
 	if t.cols == nil {
 		t.cols = make(columnAlignments)
@@ -97,17 +99,14 @@ func (t *Table) Alignment(headerText string, header Alignment, values Alignment)
 		Header: header,
 		Values: values,
 	}
-	return nil
 }
 
-// AddRow to table. An error is returned if the number of values
-// does not match the previously set number of headers.
-func (t *Table) AddRow(values ...string) error {
+// AddRow to table.
+func (t *Table) AddRow(values ...string) {
 	if len(values) != len(t.headers) {
-		return fmt.Errorf("len(values) %d != len(headers) %d", len(values), len(t.headers))
+		panic(fmt.Sprintf("len(values) %d != len(headers) %d", len(values), len(t.headers)))
 	}
 	t.rows = append(t.rows, tblCells(values, t.runes))
-	return nil
 }
 
 // String renders a table that will not be longer than the previously set maximum width.
@@ -238,9 +237,7 @@ func columnWidths(columns []*columnInfo) []int {
 }
 
 func (t *Table) columnWidths() []int {
-	paddingCount := 2 * len(t.headers)
-	dividerCount := 1 + len(t.headers)
-	overhead := paddingCount + dividerCount
+	overhead := formatOverhead(len(t.headers))
 
 	columns := make([]*columnInfo, len(t.headers))
 	for i, col := range t.headers {
@@ -267,4 +264,10 @@ func (t *Table) columnWidths() []int {
 		col = maths.Choose(col < len(wideCols)-1, col+1, 0)
 	}
 	return columnWidths(columns)
+}
+
+func formatOverhead(numHeaders int) int {
+	paddingCount := 2 * numHeaders
+	dividerCount := 1 + numHeaders
+	return paddingCount + dividerCount
 }
