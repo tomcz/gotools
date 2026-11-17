@@ -247,17 +247,20 @@ func (t *Table) columnWidths() []int {
 
 	equalWidth := (t.maxWidth - overhead) / len(columns)
 	wideCols := slices.Select(columns, func(c *columnInfo) bool { return c.width > equalWidth })
+	sdk.SortStableFunc(wideCols, func(a, b *columnInfo) int { return cmp.Compare(b.width, a.width) })
 	for _, col := range wideCols {
 		col.width = equalWidth
 	}
 
-	var col int
 	tableWidth = slices.Reduce(columns, overhead, func(acc int, c *columnInfo) int { return acc + c.width })
-	sdk.SortStableFunc(wideCols, func(a, b *columnInfo) int { return cmp.Compare(b.width, a.width) })
-	for i := t.maxWidth - tableWidth; i > 0; i-- {
+	remainder := t.maxWidth - tableWidth
+
+	var col int
+	for range remainder {
 		wideCols[col].width += 1
 		col = maths.Choose(col < len(wideCols)-1, col+1, 0)
 	}
+
 	return columnWidths(columns)
 }
 
