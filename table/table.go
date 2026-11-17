@@ -235,9 +235,9 @@ func (t *Table) columnWidths() []int {
 	overhead := formatOverhead(len(t.headers))
 
 	columns := make([]*columnInfo, len(t.headers))
-	for i, col := range t.headers {
+	for i, header := range t.headers {
 		widths := slices.Map(t.rows, func(row []tblCell) int { return row[i].Width })
-		columns[i] = &columnInfo{index: i, width: maths.MaxOf(col.Width, widths...)}
+		columns[i] = &columnInfo{index: i, width: maths.MaxOf(header.Width, widths...)}
 	}
 
 	tableWidth := slices.Reduce(columns, overhead, func(acc int, c *columnInfo) int { return acc + c.width })
