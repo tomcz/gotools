@@ -81,7 +81,14 @@ func (t *Table) BoldHeaders(bold bool) {
 }
 
 // Alignment sets the alignment for an individual table column.
-func (t *Table) Alignment(column int, header Alignment, values Alignment) {
+// An error is returned if the headerText does not match a previously set header.
+func (t *Table) Alignment(headerText string, header Alignment, values Alignment) error {
+	column := slices.IndexOf(t.headers, func(cell tblCell) bool {
+		return cell.Value == headerText
+	})
+	if column < 0 {
+		return fmt.Errorf("unknown header %q", headerText)
+	}
 	if t.cols == nil {
 		t.cols = make(columnAlignments)
 	}
@@ -89,9 +96,11 @@ func (t *Table) Alignment(column int, header Alignment, values Alignment) {
 		Header: header,
 		Values: values,
 	}
+	return nil
 }
 
-// AddRow to table. The number of values must match the previously set number of headers.
+// AddRow to table. An error is returned if the number of values
+// does not match the previously set number of headers.
 func (t *Table) AddRow(values ...string) error {
 	if len(values) != len(t.headers) {
 		return fmt.Errorf("len(values) %d != len(headers) %d", len(values), len(t.headers))

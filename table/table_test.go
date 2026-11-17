@@ -39,8 +39,8 @@ func TestTable(t *testing.T) {
 	assert.NilError(t, table.AddRow("127.0.0.1", "", "", "", "", "", ""))
 
 	table.BoldHeaders(false)
-	table.Alignment(0, Middle, Left)
-	table.Alignment(1, Middle, Right)
-	table.Alignment(2, Middle, Middle)
+	assert.NilError(t, table.Alignment("IP", Middle, Left))
+	assert.NilError(t, table.Alignment("ASN", Middle, Right))
+	assert.NilError(t, table.Alignment("AS Country", Middle, Middle))
 	assert.Equal(t, table.String(), strings.TrimSpace(expected))
 }
