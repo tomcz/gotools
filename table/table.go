@@ -191,9 +191,7 @@ func (t *Table) writeRow(sb *strings.Builder, row []tblCell, colWidths []int, co
 	for i, cell := range row {
 		cells[i] = t.runes.WrapCell(cell, colWidths[i])
 	}
-	maxLines := slices.Reduce(cells, 0, func(acc int, cell []string) int {
-		return maths.Max(acc, len(cell))
-	})
+	maxLines := slices.Reduce(cells, 1, func(acc int, cell []string) int { return max(acc, len(cell)) })
 	for line := range maxLines {
 		for i, cell := range cells {
 			if i == 0 {
@@ -235,9 +233,9 @@ func (t *Table) columnWidths() []int {
 	overhead := formatOverhead(len(t.headers))
 
 	columns := make([]*columnInfo, len(t.headers))
-	for i, header := range t.headers {
-		widths := slices.Map(t.rows, func(row []tblCell) int { return row[i].Width })
-		columns[i] = &columnInfo{index: i, width: maths.MaxOf(header.Width, widths...)}
+	for i, h := range t.headers {
+		cw := slices.Reduce(t.rows, h.Width, func(acc int, row []tblCell) int { return max(acc, row[i].Width) })
+		columns[i] = &columnInfo{index: i, width: cw}
 	}
 
 	tableWidth := slices.Reduce(columns, overhead, func(acc int, c *columnInfo) int { return acc + c.width })
