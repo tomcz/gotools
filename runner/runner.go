@@ -43,16 +43,16 @@ func WithSignals(signals ...os.Signal) Opt {
 	}
 }
 
-// WithAsyncCleanup will run the registered cleanup functions in parallel rather than the default
+// WithAsyncShutdown will run the registered shutdown functions in parallel rather than the default
 // inverse order of registration that mimics the invocation order of defers in a function.
-func WithAsyncCleanup() Opt {
+func WithAsyncShutdown() Opt {
 	return func(cfg *cfgOpt) {
 		cfg.async = true
 	}
 }
 
 // Runner will kick off all runner functions passed to the [Runner.Run] function.
-// It will invoke all registered cleanup functions when any of the runners terminates
+// It will invoke all registered shutdown functions when any of the runners terminates
 // or when an exit signal (i.e. [syscall.SIGINT] or [syscall.SIGTERM]) is received.
 type Runner struct {
 	ctx     context.Context
@@ -97,23 +97,23 @@ func New(opts ...Opt) *Runner {
 	}
 }
 
-// Cleanup registration.
-func (r *Runner) Cleanup(closers ...io.Closer) {
+// Shutdown registration.
+func (r *Runner) Shutdown(closers ...io.Closer) {
 	r.closer.Add(closers...)
 }
 
-// CleanupFunc registration.
-func (r *Runner) CleanupFunc(closer func()) {
+// ShutdownFunc registration.
+func (r *Runner) ShutdownFunc(closer func()) {
 	r.closer.AddFunc(closer)
 }
 
-// CleanupFuncE registration.
-func (r *Runner) CleanupFuncE(closer func() error) {
+// ShutdownFuncE registration.
+func (r *Runner) ShutdownFuncE(closer func() error) {
 	r.closer.AddFuncE(closer)
 }
 
-// CleanupTimeout registration.
-func (r *Runner) CleanupTimeout(closer func(ctx context.Context) error, timeout time.Duration) {
+// ShutdownTimeout registration for a graceful shutdown.
+func (r *Runner) ShutdownTimeout(closer func(ctx context.Context) error, timeout time.Duration) {
 	r.closer.AddTimeout(closer, timeout)
 }
 
@@ -125,7 +125,7 @@ func (r *Runner) Run(fn func() error) {
 	})
 }
 
-// Wait for the runners to terminate. Kick off the registered cleanup functions when any runner
+// Wait for the runners to terminate. Kick off the registered shutdown functions when any runner
 // terminates or when an exit signal (i.e. [syscall.SIGINT] or [syscall.SIGTERM]) is received.
 func (r *Runner) Wait() error {
 	r.group.Go(func() error {
@@ -133,15 +133,15 @@ func (r *Runner) Wait() error {
 		signal.Notify(sigint, r.signals...)
 		select {
 		case <-sigint:
-			return r.cleanup()
+			return r.shutdown()
 		case <-r.ctx.Done():
-			return r.cleanup()
+			return r.shutdown()
 		}
 	})
 	return r.group.Wait()
 }
 
-func (r *Runner) cleanup() error {
+func (r *Runner) shutdown() error {
 	if r.async {
 		r.closer.CloseAsync()
 	} else {

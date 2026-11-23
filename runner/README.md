@@ -1,6 +1,6 @@
 # runner
 
-Combines an errgoup.Group, a quiet.Closer, and an os/signal receiver to run functions in the background, wait for a termination signal, and then run all given cleanup tasks.
+Combines an errgoup.Group, a quiet.Closer, and an os/signal receiver to run functions in the background, wait for a termination signal, and then run all given shutdown tasks.
 
 ```go
 import (
@@ -28,7 +28,7 @@ func main() {
 	})
 
 	// register a graceful shutdown
-	app.CleanupTimeout(server.Shutdown, 100*time.Millisecond)
+	app.ShutdownTimeout(server.Shutdown, 100*time.Millisecond)
 
 	// wait for SIGINT or SIGTERM signal from the os
 	if err := app.Wait(); err != nil {

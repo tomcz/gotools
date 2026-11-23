@@ -13,22 +13,22 @@ func TestRunner(t *testing.T) {
 	var lock sync.Mutex
 	var order []string
 
-	app := New(WithAsyncCleanup())
+	app := New(WithAsyncShutdown())
 	app.Run(func() error {
 		lock.Lock()
 		order = append(order, "run")
 		lock.Unlock()
 		return nil
 	})
-	app.CleanupFunc(func() {
+	app.ShutdownFunc(func() {
 		lock.Lock()
-		order = append(order, "cleanup")
+		order = append(order, "shutdown")
 		lock.Unlock()
 	})
 	err := app.Wait()
 
 	assert.NilError(t, err)
-	assert.DeepEqual(t, order, []string{"run", "cleanup"})
+	assert.DeepEqual(t, order, []string{"run", "shutdown"})
 }
 
 func TestRunner_RunError(t *testing.T) {
@@ -38,7 +38,7 @@ func TestRunner_RunError(t *testing.T) {
 	app.Run(func() error {
 		return errors.New("test error")
 	})
-	app.CleanupFunc(func() {
+	app.ShutdownFunc(func() {
 		cleanedUp.Store(true)
 	})
 	err := app.Wait()
@@ -54,7 +54,7 @@ func TestRunner_RunPanic(t *testing.T) {
 	app.Run(func() error {
 		panic("test panic")
 	})
-	app.CleanupFunc(func() {
+	app.ShutdownFunc(func() {
 		cleanedUp.Store(true)
 	})
 	err := app.Wait()
