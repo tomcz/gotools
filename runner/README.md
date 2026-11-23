@@ -18,6 +18,9 @@ func main() {
 	// create runner with default settings
 	app := runner.New()
 
+	// register a graceful shutdown
+	app.ShutdownTimeout(server.Shutdown, 100*time.Millisecond)
+
 	// kick off the server
 	app.Run(func() error {
 		err := server.ListenAndServe()
@@ -26,9 +29,6 @@ func main() {
 		}
 		return err
 	})
-
-	// register a graceful shutdown
-	app.ShutdownTimeout(server.Shutdown, 100*time.Millisecond)
 
 	// wait for SIGINT or SIGTERM signal from the os
 	if err := app.Wait(); err != nil {
