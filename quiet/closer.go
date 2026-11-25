@@ -3,6 +3,7 @@ package quiet
 import (
 	"context"
 	"io"
+	"slices"
 	"sync"
 	"time"
 )
@@ -48,8 +49,8 @@ func (c *Closer) CloseAll() {
 	if c.logger == nil {
 		c.logger = noopLogger{}
 	}
-	for i := len(c.closers) - 1; i >= 0; i-- {
-		c.close(c.closers[i])
+	for _, closer := range slices.Backward(c.closers) {
+		c.close(closer)
 	}
 }
 
@@ -62,8 +63,7 @@ func (c *Closer) CloseAsync() {
 	}
 	var wg sync.WaitGroup
 	wg.Add(len(c.closers))
-	for i := len(c.closers) - 1; i >= 0; i-- {
-		closer := c.closers[i]
+	for _, closer := range slices.Backward(c.closers) {
 		go func() {
 			defer wg.Done()
 			c.close(closer)
