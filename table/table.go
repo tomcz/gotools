@@ -37,12 +37,12 @@ func (r runeWidths) StringWidth(txt string) int {
 	return width
 }
 
-func (r runeWidths) Cell(value string) tblCell {
+func (r runeWidths) cell(value string) tblCell {
 	return tblCell{Value: value, Width: r.StringWidth(value)}
 }
 
 func (r runeWidths) Cells(values []string) []tblCell {
-	return slices.Map(values, r.Cell)
+	return slices.Map(values, r.cell)
 }
 
 func (r runeWidths) Format(value string, width int, align Alignment) string {
@@ -65,7 +65,7 @@ func (r runeWidths) Format(value string, width int, align Alignment) string {
 	return strings.Repeat(" ", padLeft) + value + strings.Repeat(" ", padLeft+remainder)
 }
 
-func (r runeWidths) Wrap(value string, width int) []string {
+func (r runeWidths) wrap(value string, width int) []string {
 	wrapped := runewidth.Wrap(value, width)
 	return strings.Split(wrapped, "\n")
 }
@@ -78,7 +78,7 @@ func (r runeWidths) WrapCell(cell tblCell, width int) []string {
 	var lines []string
 	for word := range strings.SplitSeq(cell.Value, " ") {
 		if r.StringWidth(word) > width {
-			return r.Wrap(cell.Value, width)
+			return r.wrap(cell.Value, width)
 		}
 		if line == "" {
 			line = word

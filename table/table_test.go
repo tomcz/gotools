@@ -18,12 +18,12 @@ func TestFormat(t *testing.T) {
 
 func TestWrapCell(t *testing.T) {
 	rw := make(runeWidths)
-	assert.DeepEqual(t, []string{"Virginia"}, rw.WrapCell(rw.Cell("Virginia"), 10))
-	assert.DeepEqual(t, []string{"Queensland"}, rw.WrapCell(rw.Cell("Queensland"), 10))
+	assert.DeepEqual(t, []string{"Virginia"}, rw.WrapCell(rw.cell("Virginia"), 10))
+	assert.DeepEqual(t, []string{"Queensland"}, rw.WrapCell(rw.cell("Queensland"), 10))
 
-	actual := rw.WrapCell(rw.Cell("CLOUDFLARENET - Cloudflare, Inc."), 15)
+	actual := rw.WrapCell(rw.cell("CLOUDFLARENET - Cloudflare, Inc."), 15)
 	assert.DeepEqual(t, []string{"CLOUDFLARENET", "- Cloudflare,", "Inc."}, actual)
 
-	actual = rw.WrapCell(rw.Cell("2001:0db8:85a3:0000:0000:8a2e:0370:7334"), 5)
+	actual = rw.WrapCell(rw.cell("2001:0db8:85a3:0000:0000:8a2e:0370:7334"), 5)
 	assert.DeepEqual(t, []string{"2001:", "0db8:", "85a3:", "0000:", "0000:", "8a2e:", "0370:", "7334"}, actual)
 }
