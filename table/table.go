@@ -134,19 +134,19 @@ func (t *Table) BoldHeaders(bold bool) {
 	t.boldHeaders = bold
 }
 
-// Alignment sets the alignment for an individual table column.
-func (t *Table) Alignment(headerText string, header Alignment, values Alignment) {
+// Alignment sets the alignment for an individual table column identified by the given header.
+func (t *Table) Alignment(header string, headerAlign Alignment, valuesAlign Alignment) {
 	column := slices.IndexOf(t.headers, func(cell tblCell) bool {
-		return cell.Value == headerText
+		return cell.Value == header
 	})
 	if column < 0 {
-		panic(fmt.Sprintf("unknown header %q", headerText))
+		panic(fmt.Sprintf("unknown header %q", header))
 	}
-	t.headerAlign[column] = header
-	t.valuesAlign[column] = values
+	t.headerAlign[column] = headerAlign
+	t.valuesAlign[column] = valuesAlign
 }
 
-// AddRow to table.
+// AddRow to table. The count of values must match the count of headers.
 func (t *Table) AddRow(values ...string) {
 	if len(values) != len(t.headers) {
 		panic(fmt.Sprintf("len(values) %d != len(headers) %d", len(values), len(t.headers)))
