@@ -2,9 +2,6 @@ package slices
 
 // Chunk given slice into a fixed number of parts.
 //
-//   - [Chunk]: fixed number of parts, variable part size.
-//   - [Split]: variable number of parts, fixed part size.
-//
 // NOTE: If the number of parts exceeds the size of the
 // source slice then the resulting slice will contain
 // one element slices for each element in the source

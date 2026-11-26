@@ -2,9 +2,6 @@ package slices
 
 // Split given slice into equal sized parts.
 //
-//   - [Chunk]: fixed number of parts, variable part size.
-//   - [Split]: variable number of parts, fixed part size.
-//
 // NOTE: The last part may have an unequal length if
 // the size of the source slice is not divisible by
 // the required length without leaving a remainder.
