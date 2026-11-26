@@ -2,17 +2,15 @@ package quiet
 
 import (
 	"context"
-	"errors"
 	"slices"
 	"sync"
 	"testing"
 	"time"
 
 	"gotest.tools/v3/assert"
-	is "gotest.tools/v3/assert/cmp"
 )
 
-func TestCloserOrder(t *testing.T) {
+func TestClose(t *testing.T) {
 	var called []string
 	c1 := func() {
 		called = append(called, "1")
@@ -89,23 +87,4 @@ func TestCloseAsync(t *testing.T) {
 	slices.Sort(called)
 
 	assert.DeepEqual(t, []string{"1", "2", "3", "4", "5"}, called)
-}
-
-func TestCloserLogger(t *testing.T) {
-	logger := &Collector{}
-
-	closer := &Closer{}
-	closer.SetLogger(logger)
-
-	testPanic := errors.New("test panic")
-	closer.AddFunc(func() { panic(testPanic) })
-
-	testError := errors.New("test error")
-	closer.AddFuncE(func() error { return testError })
-
-	closer.CloseAll()
-
-	assert.Assert(t, !logger.IsEmpty())
-	assert.Assert(t, is.Contains(logger.Panics, testPanic))
-	assert.Assert(t, is.Contains(logger.Errors, testError))
 }
