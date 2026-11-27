@@ -21,35 +21,29 @@ func (c *Collector) Collect(funcs ...func() error) []error {
 	if len(funcs) == 0 {
 		return nil
 	}
-
-	var handler PanicHandler
-	if c.Handler != nil {
-		handler = c.Handler
-	} else {
-		handler = defaultPanicHandler{}
+	if c.Handler == nil {
+		c.Handler = defaultPanicHandler{}
 	}
-
 	errs := &errorList{}
 	var wg sync.WaitGroup
-	wg.Add(len(funcs))
+	for _, f := range funcs {
+		wg.Go(c.collect(errs, f))
+	}
+	wg.Wait()
+	return errs.list
+}
 
-	run := func(f func() error) {
+func (c *Collector) collect(errs *errorList, f func() error) func() {
+	return func() {
 		defer func() {
 			if p := recover(); p != nil {
-				errs.Append(handler.Panic(p))
+				errs.Append(c.Handler.Panic(p))
 			}
-			wg.Done()
 		}()
 		if err := f(); err != nil {
 			errs.Append(err)
 		}
 	}
-	for _, f := range funcs {
-		go run(f)
-	}
-
-	wg.Wait()
-	return errs.list
 }
 
 type errorList struct {
