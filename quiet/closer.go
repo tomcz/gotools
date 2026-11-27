@@ -61,17 +61,9 @@ func (c *Closer) CloseAsync() {
 	if c.logger == nil {
 		c.logger = noopLogger{}
 	}
-
 	var wg sync.WaitGroup
-	wg.Add(len(c.closers))
-
-	async := func(closer io.Closer) {
-		defer wg.Done()
-		c.close(closer)
-	}
-
 	for _, closer := range slices.Backward(c.closers) {
-		go async(closer)
+		wg.Go(c.closeFunc(closer))
 	}
 	wg.Wait()
 }
@@ -81,6 +73,10 @@ func (c *Closer) CloseAsync() {
 func (c *Closer) Close() error {
 	c.CloseAll()
 	return nil
+}
+
+func (c *Closer) closeFunc(closer io.Closer) func() {
+	return func() { c.close(closer) }
 }
 
 func (c *Closer) close(closer io.Closer) {
