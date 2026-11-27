@@ -6,8 +6,6 @@ import (
 )
 
 // Pool implements a garbage-collection-friendly pool of output buffers backed by [sync.Pool].
-//
-// Each borrowed buffer must be returned back to the pool to allow reuse and prevent memory leaks.
 type Pool struct {
 	pool sync.Pool
 }
@@ -22,7 +20,9 @@ func New() *Pool {
 	}
 }
 
-// Borrow buffer from the pool.
+// Borrow a buffer from the pool.
+//
+// Each borrowed buffer must be returned back to the pool to allow reuse and prevent memory leaks.
 func (p *Pool) Borrow() *bytes.Buffer {
 	return p.pool.Get().(*bytes.Buffer)
 }
