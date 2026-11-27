@@ -5,17 +5,19 @@ import (
 	"runtime/debug"
 )
 
-// PanicHandler to deal with recovered panics. The default handler combines
-// a recovered panic and the current [debug.Stack] into a single error.
+// PanicHandler to deal with recovered panics.
 type PanicHandler interface {
 	Panic(p any) error
 }
 
-var _ PanicHandler = (*defaultPanicHandler)(nil)
+// enforce interface implementation
+var _ PanicHandler = (*DefaultPanicHandler)(nil)
 
-type defaultPanicHandler struct{}
+// DefaultPanicHandler used by both [PanicGroup] and [Collector].
+type DefaultPanicHandler struct{}
 
-func (d defaultPanicHandler) Panic(p any) error {
+// Panic combines the recovered panic and the current [debug.Stack] into a single error.
+func (d DefaultPanicHandler) Panic(p any) error {
 	stack := string(debug.Stack())
 	if err, ok := p.(error); ok {
 		return fmt.Errorf("panic: %w; stack: %s", err, stack)

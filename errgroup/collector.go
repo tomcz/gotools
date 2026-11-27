@@ -9,7 +9,7 @@ func Collect(funcs ...func() error) []error {
 
 // Collector of errors.
 type Collector struct {
-	// Optional. The default handler will be used if this is nil.
+	// Optional. The [DefaultPanicHandler] will be used if this is nil.
 	Handler PanicHandler
 }
 
@@ -22,7 +22,7 @@ func (c *Collector) Collect(funcs ...func() error) []error {
 		return nil
 	}
 	if c.Handler == nil {
-		c.Handler = defaultPanicHandler{}
+		c.Handler = DefaultPanicHandler{}
 	}
 	errs := &errorList{}
 	var wg sync.WaitGroup

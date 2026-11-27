@@ -17,7 +17,7 @@ type PanicGroup struct {
 func New() *PanicGroup {
 	return &PanicGroup{
 		group:   &errgroup.Group{},
-		handler: defaultPanicHandler{},
+		handler: DefaultPanicHandler{},
 	}
 }
 
@@ -26,7 +26,7 @@ func New() *PanicGroup {
 // or when the Wait function exits.
 func NewContext(ctx context.Context) (*PanicGroup, context.Context) {
 	group, ctx := errgroup.WithContext(ctx)
-	pg := &PanicGroup{group: group, handler: defaultPanicHandler{}}
+	pg := &PanicGroup{group: group, handler: DefaultPanicHandler{}}
 	return pg, ctx
 }
 
@@ -36,7 +36,7 @@ func (g *PanicGroup) SetPanicHandler(handler PanicHandler) {
 	if handler != nil {
 		g.handler = handler
 	} else {
-		g.handler = defaultPanicHandler{}
+		g.handler = DefaultPanicHandler{}
 	}
 }
 
