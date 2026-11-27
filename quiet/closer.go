@@ -68,7 +68,7 @@ func (c *Closer) CloseAsync() {
 	wg.Wait()
 }
 
-// Close for [io.Closer] compatibility.
+// Close implements [io.Closer].
 // Calls [Closer.CloseAll] and returns nil.
 func (c *Closer) Close() error {
 	c.CloseAll()
