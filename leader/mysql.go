@@ -14,7 +14,9 @@ type MysqlOpt func(leader *mysqlLeader)
 // The default value is created by [rand.Text].
 func WithNodeName(name string) MysqlOpt {
 	return func(leader *mysqlLeader) {
-		leader.nodeName = name
+		if name != "" {
+			leader.nodeName = name
+		}
 	}
 }
 
@@ -22,7 +24,9 @@ func WithNodeName(name string) MysqlOpt {
 // be specified. The default is 15 seconds.
 func WithTick(tick time.Duration) MysqlOpt {
 	return func(leader *mysqlLeader) {
-		leader.tick = tick
+		if tick > time.Second {
+			leader.tick = tick
+		}
 	}
 }
 
@@ -30,7 +34,9 @@ func WithTick(tick time.Duration) MysqlOpt {
 // to be specified. The default is 60 seconds.
 func WithAge(age time.Duration) MysqlOpt {
 	return func(leader *mysqlLeader) {
-		leader.age = age
+		if age > time.Second {
+			leader.age = age
+		}
 	}
 }
 
@@ -45,7 +51,9 @@ func WithAge(age time.Duration) MysqlOpt {
 // will continue on the next clock tick.
 func WithOnError(onError func(error) error) MysqlOpt {
 	return func(leader *mysqlLeader) {
-		leader.onError = onError
+		if onError != nil {
+			leader.onError = onError
+		}
 	}
 }
 
@@ -75,21 +83,16 @@ type mysqlLeader struct {
 // that tasks that require leadership election do not run for longer than
 // either the tick or age intervals.
 func NewMysqlLeader(db *sql.DB, leaderName string, opts ...MysqlOpt) Leader {
-	leader := &mysqlLeader{db: db, leaderName: leaderName}
+	leader := &mysqlLeader{
+		db:         db,
+		leaderName: leaderName,
+		nodeName:   rand.Text(),
+		tick:       15 * time.Second,
+		age:        60 * time.Second,
+		onError:    AbortOnError,
+	}
 	for _, opt := range opts {
 		opt(leader)
-	}
-	if leader.nodeName == "" {
-		leader.nodeName = rand.Text()
-	}
-	if leader.tick < time.Second {
-		leader.tick = 15 * time.Second
-	}
-	if leader.age < time.Second {
-		leader.age = 60 * time.Second
-	}
-	if leader.onError == nil {
-		leader.onError = AbortOnError
 	}
 	return leader
 }
